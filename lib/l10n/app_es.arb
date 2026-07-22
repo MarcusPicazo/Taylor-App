@@ -357,5 +357,36 @@
   "chatQuickComingOut": "Ya salgo",
   "chatQuickTwoMinutes": "Dame 2 minutos",
   "chatQuickWhereAreYou": "¿Dónde estás?",
-  "chatQuickThanks": "¡Gracias!"
+  "chatQuickThanks": "¡Gracias!",
+
+  "tripCompleted": "Llegaste a tu destino",
+  "rateTitle": "¿Cómo estuvo tu viaje?",
+  "rateWith": "con {name}",
+  "@rateWith": { "placeholders": { "name": { "type": "String" } } },
+  "rateCommentHint": "Cuéntanos más (opcional)",
+  "rateSubmit": "Enviar calificación",
+  "rateSkip": "Ahora no",
+  "rateThanks": "Gracias por calificar",
+  "rateTagPunctual": "Puntual",
+  "rateTagFriendly": "Amable",
+  "rateTagSafeDriving": "Manejo seguro",
+  "rateTagCleanCar": "Auto limpio",
+  "rateTagComfortable": "Me sentí cómoda",
+  "rateSafetyTitle": "¿Pasó algo que debamos saber?",
+  "rateSafetyBody": "Si te sentiste insegura en cualquier momento, cuéntanos. Lo revisa nuestro equipo de seguridad, no un algoritmo.",
+  "rateSafetyReport": "Reportar a seguridad",
+  "rateSafetySent": "Recibido. Nuestro equipo lo revisará y te contactará.",
+
+  "receiptTitle": "Recibo",
+  "receiptBase": "Tarifa base",
+  "receiptDistance": "Distancia ({km} km)",
+  "@receiptDistance": { "placeholders": { "km": { "type": "String" } } },
+  "receiptTime": "Tiempo ({minutes} min)",
+  "@receiptTime": { "placeholders": { "minutes": { "type": "int" } } },
+  "receiptTotal": "Total",
+  "receiptPaidWith": "Pagado con",
+  "receiptViewReceipt": "Ver recibo",
+  "receiptShare": "Compartir recibo",
+
+  "driveRatePassenger": "¿Cómo estuvo la pasajera?"
 }

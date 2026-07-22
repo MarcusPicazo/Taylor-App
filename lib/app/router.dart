@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../data/models/driver_profile.dart';
 import '../data/models/taylor_user.dart';
+import '../data/models/trip.dart';
 import '../data/session_controller.dart';
 import '../features/account/account_screen.dart';
 import '../features/account/help_screen.dart';
@@ -29,6 +30,7 @@ import '../features/home/home_screen.dart';
 import '../features/onboarding/onboarding_flow_screen.dart';
 import '../features/safety/safety_screen.dart';
 import '../features/splash/splash_screen.dart';
+import '../features/trips/receipt_screen.dart';
 import '../features/trips/trips_screen.dart';
 import 'app_mode.dart';
 import 'business_shell_scaffold.dart';
@@ -68,6 +70,9 @@ abstract final class Routes {
 
   /// Chat del viaje activo. Se resuelve según el modo en curso.
   static const chat = '/chat';
+
+  /// Recibo de un viaje. Recibe el [Trip] por `extra`.
+  static const receipt = '/receipt';
 
   /// Rutas que solo existen en modo conductora.
   static bool isDriverRoute(String location) => location.startsWith('/drive');
@@ -287,6 +292,20 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: Routes.chat,
         builder: (context, state) => const TripChatRoute(),
+      ),
+
+      // El recibo recibe el viaje por `extra` en vez de por id: se abre tanto
+      // desde el cierre del viaje activo como desde el historial, y en ambos
+      // casos quien navega ya tiene el objeto completo. Buscarlo de nuevo por
+      // id obligaría a mantener un repositorio solo para esto.
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: Routes.receipt,
+        builder: (context, state) {
+          final trip = state.extra;
+          if (trip is! Trip) return const SizedBox.shrink();
+          return ReceiptScreen(trip: trip);
+        },
       ),
     ],
   );

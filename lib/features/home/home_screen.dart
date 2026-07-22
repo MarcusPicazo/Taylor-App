@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/models/trip.dart';
 import '../../data/session_controller.dart';
+import '../trips/rating_card.dart';
 import 'ride_controller.dart';
 import 'widgets/driver_assigned_card.dart';
 import 'widgets/map_view.dart';
@@ -72,8 +73,14 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             child: switch (trip?.status) {
-              null || TripStatus.completed || TripStatus.cancelled =>
-                RideRequestSheet(
+              // El viaje terminado sigue siendo el viaje activo hasta que la
+              // pasajera califica o descarta: es ese momento el que cierra el
+              // ciclo, no la llegada al destino.
+              TripStatus.completed => RatingCard(
+                  key: const ValueKey('rating'),
+                  trip: trip!,
+                ),
+              null || TripStatus.cancelled => RideRequestSheet(
                   key: const ValueKey('request'),
                   userName: user?.firstName ?? '',
                   onRequest: (origin, destination) => ref

@@ -137,6 +137,11 @@ class _TripCard extends StatelessWidget {
                 ],
                 const Spacer(),
                 TextButton(
+                  onPressed: () =>
+                      context.push(Routes.receipt, extra: trip),
+                  child: Text(l10n.receiptViewReceipt),
+                ),
+                TextButton(
                   onPressed: () => context.push(Routes.help),
                   child: Text(l10n.tripHelp),
                 ),

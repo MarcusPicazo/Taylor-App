@@ -959,4 +959,87 @@ class L10nEs extends L10n {
 
   @override
   String get chatQuickThanks => '¡Gracias!';
+
+  @override
+  String get tripCompleted => 'Llegaste a tu destino';
+
+  @override
+  String get rateTitle => '¿Cómo estuvo tu viaje?';
+
+  @override
+  String rateWith(String name) {
+    return 'con $name';
+  }
+
+  @override
+  String get rateCommentHint => 'Cuéntanos más (opcional)';
+
+  @override
+  String get rateSubmit => 'Enviar calificación';
+
+  @override
+  String get rateSkip => 'Ahora no';
+
+  @override
+  String get rateThanks => 'Gracias por calificar';
+
+  @override
+  String get rateTagPunctual => 'Puntual';
+
+  @override
+  String get rateTagFriendly => 'Amable';
+
+  @override
+  String get rateTagSafeDriving => 'Manejo seguro';
+
+  @override
+  String get rateTagCleanCar => 'Auto limpio';
+
+  @override
+  String get rateTagComfortable => 'Me sentí cómoda';
+
+  @override
+  String get rateSafetyTitle => '¿Pasó algo que debamos saber?';
+
+  @override
+  String get rateSafetyBody =>
+      'Si te sentiste insegura en cualquier momento, cuéntanos. Lo revisa nuestro equipo de seguridad, no un algoritmo.';
+
+  @override
+  String get rateSafetyReport => 'Reportar a seguridad';
+
+  @override
+  String get rateSafetySent =>
+      'Recibido. Nuestro equipo lo revisará y te contactará.';
+
+  @override
+  String get receiptTitle => 'Recibo';
+
+  @override
+  String get receiptBase => 'Tarifa base';
+
+  @override
+  String receiptDistance(String km) {
+    return 'Distancia ($km km)';
+  }
+
+  @override
+  String receiptTime(int minutes) {
+    return 'Tiempo ($minutes min)';
+  }
+
+  @override
+  String get receiptTotal => 'Total';
+
+  @override
+  String get receiptPaidWith => 'Pagado con';
+
+  @override
+  String get receiptViewReceipt => 'Ver recibo';
+
+  @override
+  String get receiptShare => 'Compartir recibo';
+
+  @override
+  String get driveRatePassenger => '¿Cómo estuvo la pasajera?';
 }

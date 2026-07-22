@@ -6,6 +6,7 @@ import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
 import '../../../data/models/trip.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../trips/widgets/star_rating.dart';
 
 /// Resumen al terminar un viaje.
 ///
@@ -13,7 +14,7 @@ import '../../../l10n/app_localizations.dart';
 /// total. Que la conductora vea exactamente qué se retuvo es parte de la
 /// propuesta de Taylor: la opacidad en las ganancias es una de las quejas
 /// centrales contra las plataformas existentes.
-class TripSummaryCard extends StatelessWidget {
+class TripSummaryCard extends StatefulWidget {
   const TripSummaryCard({
     super.key,
     required this.trip,
@@ -23,11 +24,19 @@ class TripSummaryCard extends StatelessWidget {
   final Trip trip;
   final VoidCallback onDismiss;
 
+  @override
+  State<TripSummaryCard> createState() => _TripSummaryCardState();
+}
+
+class _TripSummaryCardState extends State<TripSummaryCard> {
   /// Comisión de Taylor.
   static const double _commissionRate = 0.18;
 
+  int _passengerStars = 0;
+
   @override
   Widget build(BuildContext context) {
+    final trip = widget.trip;
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
@@ -88,7 +97,30 @@ class TripSummaryCard extends StatelessWidget {
             ),
 
             const SizedBox(height: TaylorSpacing.md),
-            FilledButton(onPressed: onDismiss, child: Text(l10n.done)),
+            Divider(color: theme.colorScheme.outline),
+            const SizedBox(height: TaylorSpacing.sm),
+
+            // Calificación mutua: la conductora también evalúa el viaje. En
+            // una red cerrada de mujeres verificadas la reputación va en los
+            // dos sentidos, y una pasajera problemática es tan relevante para
+            // la seguridad como una conductora problemática.
+            Text(
+              l10n.driveRatePassenger,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: TaylorSpacing.sm),
+            StarRating(
+              value: _passengerStars,
+              size: 38,
+              onChanged: (v) => setState(() => _passengerStars = v),
+            ),
+
+            const SizedBox(height: TaylorSpacing.md),
+            FilledButton(
+              onPressed: widget.onDismiss,
+              child: Text(l10n.done),
+            ),
           ],
         ),
       ),

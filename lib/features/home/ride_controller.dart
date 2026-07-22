@@ -61,6 +61,15 @@ class RideController extends StateNotifier<Trip?> {
           title: 'Tu conductora llegó',
           body: '${driver.carModel} · ${driver.plate}',
         );
+
+        // Sube al coche y arranca el trayecto.
+        _advanceAfter(const Duration(seconds: 6), () {
+          startTrip();
+
+          // Y llega a destino. En producción esto lo dispara la conductora
+          // desde su lado, no un temporizador.
+          _advanceAfter(const Duration(seconds: 8), completeTrip);
+        });
       });
     });
   }
@@ -73,11 +82,35 @@ class RideController extends StateNotifier<Trip?> {
     });
   }
 
-  void startTrip() => state = state?.copyWith(status: TripStatus.inProgress);
+  void startTrip() {
+    state = state?.copyWith(status: TripStatus.inProgress);
+
+    TaylorNotifications.instance.showTripStatus(
+      tripId: state?.id ?? '',
+      title: 'Viaje iniciado',
+      body: 'Rumbo a ${state?.destination.address ?? ''}',
+    );
+  }
 
   void completeTrip() {
     _timer?.cancel();
     state = state?.copyWith(status: TripStatus.completed);
+  }
+
+  /// Guarda la calificación de la pasajera sobre la conductora.
+  void rate(double stars) {
+    state = state?.copyWith(rating: stars);
+  }
+
+  /// Cierra el viaje terminado y devuelve la pantalla de Inicio a su estado
+  /// inicial.
+  ///
+  /// Separado de [completeTrip] a propósito: entre "llegué" y "ya terminé de
+  /// calificar" hay un momento en el que el viaje sigue siendo el viaje
+  /// activo, y la pantalla necesita saber distinguirlos.
+  void dismiss() {
+    _timer?.cancel();
+    state = null;
   }
 
   void cancel() {

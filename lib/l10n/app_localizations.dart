@@ -1812,6 +1812,156 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'¡Gracias!'**
   String get chatQuickThanks;
+
+  /// No description provided for @tripCompleted.
+  ///
+  /// In es, this message translates to:
+  /// **'Llegaste a tu destino'**
+  String get tripCompleted;
+
+  /// No description provided for @rateTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cómo estuvo tu viaje?'**
+  String get rateTitle;
+
+  /// No description provided for @rateWith.
+  ///
+  /// In es, this message translates to:
+  /// **'con {name}'**
+  String rateWith(String name);
+
+  /// No description provided for @rateCommentHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuéntanos más (opcional)'**
+  String get rateCommentHint;
+
+  /// No description provided for @rateSubmit.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar calificación'**
+  String get rateSubmit;
+
+  /// No description provided for @rateSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahora no'**
+  String get rateSkip;
+
+  /// No description provided for @rateThanks.
+  ///
+  /// In es, this message translates to:
+  /// **'Gracias por calificar'**
+  String get rateThanks;
+
+  /// No description provided for @rateTagPunctual.
+  ///
+  /// In es, this message translates to:
+  /// **'Puntual'**
+  String get rateTagPunctual;
+
+  /// No description provided for @rateTagFriendly.
+  ///
+  /// In es, this message translates to:
+  /// **'Amable'**
+  String get rateTagFriendly;
+
+  /// No description provided for @rateTagSafeDriving.
+  ///
+  /// In es, this message translates to:
+  /// **'Manejo seguro'**
+  String get rateTagSafeDriving;
+
+  /// No description provided for @rateTagCleanCar.
+  ///
+  /// In es, this message translates to:
+  /// **'Auto limpio'**
+  String get rateTagCleanCar;
+
+  /// No description provided for @rateTagComfortable.
+  ///
+  /// In es, this message translates to:
+  /// **'Me sentí cómoda'**
+  String get rateTagComfortable;
+
+  /// No description provided for @rateSafetyTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Pasó algo que debamos saber?'**
+  String get rateSafetyTitle;
+
+  /// No description provided for @rateSafetyBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Si te sentiste insegura en cualquier momento, cuéntanos. Lo revisa nuestro equipo de seguridad, no un algoritmo.'**
+  String get rateSafetyBody;
+
+  /// No description provided for @rateSafetyReport.
+  ///
+  /// In es, this message translates to:
+  /// **'Reportar a seguridad'**
+  String get rateSafetyReport;
+
+  /// No description provided for @rateSafetySent.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibido. Nuestro equipo lo revisará y te contactará.'**
+  String get rateSafetySent;
+
+  /// No description provided for @receiptTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Recibo'**
+  String get receiptTitle;
+
+  /// No description provided for @receiptBase.
+  ///
+  /// In es, this message translates to:
+  /// **'Tarifa base'**
+  String get receiptBase;
+
+  /// No description provided for @receiptDistance.
+  ///
+  /// In es, this message translates to:
+  /// **'Distancia ({km} km)'**
+  String receiptDistance(String km);
+
+  /// No description provided for @receiptTime.
+  ///
+  /// In es, this message translates to:
+  /// **'Tiempo ({minutes} min)'**
+  String receiptTime(int minutes);
+
+  /// No description provided for @receiptTotal.
+  ///
+  /// In es, this message translates to:
+  /// **'Total'**
+  String get receiptTotal;
+
+  /// No description provided for @receiptPaidWith.
+  ///
+  /// In es, this message translates to:
+  /// **'Pagado con'**
+  String get receiptPaidWith;
+
+  /// No description provided for @receiptViewReceipt.
+  ///
+  /// In es, this message translates to:
+  /// **'Ver recibo'**
+  String get receiptViewReceipt;
+
+  /// No description provided for @receiptShare.
+  ///
+  /// In es, this message translates to:
+  /// **'Compartir recibo'**
+  String get receiptShare;
+
+  /// No description provided for @driveRatePassenger.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cómo estuvo la pasajera?'**
+  String get driveRatePassenger;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

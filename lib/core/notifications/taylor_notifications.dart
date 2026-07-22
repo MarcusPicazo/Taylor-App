@@ -13,6 +13,14 @@ import 'notification_payload.dart';
 /// método. Eso significa que activar push remoto no obliga a reescribir ni una
 /// sola de estas llamadas — solo a añadir quien las dispara.
 ///
+/// **Ningún método de esta clase lanza excepciones.** Las notificaciones son
+/// una mejora, nunca un requisito: un plugin que falla —sin plataforma detrás
+/// en tests, permiso revocado, fabricante con gestión agresiva de
+/// notificaciones— no puede tumbar el flujo del viaje. Este contrato se
+/// descubrió rompiéndose: una excepción del plugin dejaba la máquina de
+/// estados del viaje a medias, arrancando el trayecto pero sin completarlo
+/// nunca.
+///
 /// Ver README → "Activar push remoto".
 class TaylorNotifications {
   TaylorNotifications._();
@@ -46,7 +54,26 @@ class TaylorNotifications {
     return payload;
   }
 
-  Future<void> initialize() async {
+  /// Ejecuta una operación de notificación sin que su fallo escape.
+  ///
+  /// Es el mecanismo que sostiene el contrato "nada de aquí lanza". Todos los
+  /// métodos públicos pasan por aquí.
+  Future<void> _safely(Future<void> Function() action) async {
+    try {
+      await action();
+    } catch (error, stack) {
+      // En producción esto debería ir al reporte de errores. Nunca al usuario:
+      // una notificación que no sale no es algo que se pueda accionar.
+      assert(() {
+        debugPrint('TaylorNotifications: $error\n$stack');
+        return true;
+      }());
+    }
+  }
+
+  Future<void> initialize() => _safely(_initialize);
+
+  Future<void> _initialize() async {
     if (_initialized) return;
 
     const settings = InitializationSettings(
@@ -91,11 +118,13 @@ class TaylorNotifications {
     final payload = switch (response.actionId) {
       'accept' => NotificationPayload(
           action: NotificationAction.acceptRide,
-          referenceId: NotificationPayload.decode(response.payload)?.referenceId,
+          referenceId:
+              NotificationPayload.decode(response.payload)?.referenceId,
         ),
       'decline' => NotificationPayload(
           action: NotificationAction.declineRide,
-          referenceId: NotificationPayload.decode(response.payload)?.referenceId,
+          referenceId:
+              NotificationPayload.decode(response.payload)?.referenceId,
         ),
       _ => NotificationPayload.decode(response.payload),
     };
@@ -109,23 +138,34 @@ class TaylorNotifications {
   /// el manifiesto. Se llama en contexto —cuando la conductora se pone en
   /// línea, no al abrir la app— para que la petición tenga sentido y se
   /// acepte.
+  ///
+  /// Devuelve `false` si algo falla, nunca lanza.
   Future<bool> requestPermission() async {
-    await initialize();
+    var granted = false;
 
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
-    if (android != null) {
-      return await android.requestNotificationsPermission() ?? false;
-    }
+    await _safely(() async {
+      await _initialize();
 
-    final ios = _plugin.resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>();
-    if (ios != null) {
-      return await ios.requestPermissions(alert: true, badge: true, sound: true) ??
-          false;
-    }
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        granted = await android.requestNotificationsPermission() ?? false;
+        return;
+      }
 
-    return false;
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        granted = await ios.requestPermissions(
+              alert: true,
+              badge: true,
+              sound: true,
+            ) ??
+            false;
+      }
+    });
+
+    return granted;
   }
 
   // --- Notificaciones concretas -------------------------------------------
@@ -142,164 +182,168 @@ class TaylorNotifications {
     required String fare,
     required String pickupAddress,
     Duration timeout = const Duration(seconds: 15),
-  }) async {
-    await initialize();
+  }) {
+    return _safely(() async {
+      await _initialize();
 
-    final payload = NotificationPayload(
-      action: NotificationAction.openRideRequest,
-      referenceId: requestId,
-    );
-
-    await _plugin.show(
-      _NotificationIds.rideRequest,
-      'Viaje de $passengerName · $fare',
-      pickupAddress,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          TaylorChannels.rideRequest.id,
-          TaylorChannels.rideRequest.name,
-          channelDescription: TaylorChannels.rideRequest.description,
-          importance: Importance.max,
-          priority: Priority.max,
-          category: AndroidNotificationCategory.call,
-          // Se muestra sobre la pantalla de bloqueo: la conductora puede tener
-          // el teléfono bloqueado en el soporte.
-          fullScreenIntent: true,
-          timeoutAfter: timeout.inMilliseconds,
-          // No se puede descartar deslizando: responder es la única salida,
-          // y así no desaparece por accidente al manipular el teléfono.
-          ongoing: true,
-          autoCancel: false,
-          actions: const [
-            AndroidNotificationAction(
-              'decline',
-              'Rechazar',
-              cancelNotification: true,
-            ),
-            AndroidNotificationAction(
-              'accept',
-              'Aceptar',
-              showsUserInterface: true,
-              cancelNotification: true,
-            ),
-          ],
+      await _plugin.show(
+        _NotificationIds.rideRequest,
+        'Viaje de $passengerName · $fare',
+        pickupAddress,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            TaylorChannels.rideRequest.id,
+            TaylorChannels.rideRequest.name,
+            channelDescription: TaylorChannels.rideRequest.description,
+            importance: Importance.max,
+            priority: Priority.max,
+            category: AndroidNotificationCategory.call,
+            // Se muestra sobre la pantalla de bloqueo: la conductora puede
+            // tener el teléfono bloqueado en el soporte.
+            fullScreenIntent: true,
+            timeoutAfter: timeout.inMilliseconds,
+            // No se puede descartar deslizando: responder es la única salida,
+            // y así no desaparece por accidente al manipular el teléfono.
+            ongoing: true,
+            autoCancel: false,
+            actions: const [
+              AndroidNotificationAction(
+                'decline',
+                'Rechazar',
+                cancelNotification: true,
+              ),
+              AndroidNotificationAction(
+                'accept',
+                'Aceptar',
+                showsUserInterface: true,
+                cancelNotification: true,
+              ),
+            ],
+          ),
+          iOS: const DarwinNotificationDetails(
+            interruptionLevel: InterruptionLevel.timeSensitive,
+          ),
         ),
-        iOS: const DarwinNotificationDetails(
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ),
-      payload: payload.encode(),
-    );
+        payload: NotificationPayload(
+          action: NotificationAction.openRideRequest,
+          referenceId: requestId,
+        ).encode(),
+      );
+    });
   }
 
-  Future<void> cancelRideRequest() async {
-    await _plugin.cancel(_NotificationIds.rideRequest);
-  }
+  Future<void> cancelRideRequest() =>
+      _safely(() => _plugin.cancel(_NotificationIds.rideRequest));
 
   /// Cambio de estado del viaje, para la pasajera.
   Future<void> showTripStatus({
     required String tripId,
     required String title,
     required String body,
-  }) async {
-    await initialize();
+  }) {
+    return _safely(() async {
+      await _initialize();
 
-    await _plugin.show(
-      _NotificationIds.tripStatus,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          TaylorChannels.tripStatus.id,
-          TaylorChannels.tripStatus.name,
-          channelDescription: TaylorChannels.tripStatus.description,
-          importance: Importance.high,
-          priority: Priority.high,
+      await _plugin.show(
+        _NotificationIds.tripStatus,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            TaylorChannels.tripStatus.id,
+            TaylorChannels.tripStatus.name,
+            channelDescription: TaylorChannels.tripStatus.description,
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: const DarwinNotificationDetails(
+            interruptionLevel: InterruptionLevel.timeSensitive,
+          ),
         ),
-        iOS: const DarwinNotificationDetails(
-          interruptionLevel: InterruptionLevel.timeSensitive,
-        ),
-      ),
-      payload: NotificationPayload(
-        action: NotificationAction.openTrip,
-        referenceId: tripId,
-      ).encode(),
-    );
+        payload: NotificationPayload(
+          action: NotificationAction.openTrip,
+          referenceId: tripId,
+        ).encode(),
+      );
+    });
   }
 
   /// Aviso de seguridad: ubicación compartida, contactos notificados.
   Future<void> showSafetyAlert({
     required String title,
     required String body,
-  }) async {
-    await initialize();
+  }) {
+    return _safely(() async {
+      await _initialize();
 
-    await _plugin.show(
-      _NotificationIds.safety,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          TaylorChannels.safety.id,
-          TaylorChannels.safety.name,
-          channelDescription: TaylorChannels.safety.description,
-          importance: Importance.max,
-          priority: Priority.max,
-          category: AndroidNotificationCategory.status,
-          // Persistente mientras la ubicación esté compartiéndose: es un
-          // estado activo, no un evento puntual.
-          ongoing: true,
-          autoCancel: false,
+      await _plugin.show(
+        _NotificationIds.safety,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            TaylorChannels.safety.id,
+            TaylorChannels.safety.name,
+            channelDescription: TaylorChannels.safety.description,
+            importance: Importance.max,
+            priority: Priority.max,
+            category: AndroidNotificationCategory.status,
+            // Persistente mientras la ubicación esté compartiéndose: es un
+            // estado activo, no un evento puntual.
+            ongoing: true,
+            autoCancel: false,
+          ),
+          iOS: const DarwinNotificationDetails(
+            interruptionLevel: InterruptionLevel.critical,
+          ),
         ),
-        iOS: const DarwinNotificationDetails(
-          interruptionLevel: InterruptionLevel.critical,
-        ),
-      ),
-      payload: const NotificationPayload(
-        action: NotificationAction.openSafety,
-      ).encode(),
-    );
+        payload: const NotificationPayload(
+          action: NotificationAction.openSafety,
+        ).encode(),
+      );
+    });
   }
 
-  Future<void> cancelSafetyAlert() async {
-    await _plugin.cancel(_NotificationIds.safety);
-  }
+  Future<void> cancelSafetyAlert() =>
+      _safely(() => _plugin.cancel(_NotificationIds.safety));
 
   /// Aviso del panel empresarial.
   Future<void> showBusinessAlert({
     required String title,
     required String body,
     bool urgent = false,
-  }) async {
-    await initialize();
+  }) {
+    return _safely(() async {
+      await _initialize();
 
-    await _plugin.show(
-      _NotificationIds.business,
-      title,
-      body,
-      NotificationDetails(
-        android: AndroidNotificationDetails(
-          TaylorChannels.business.id,
-          TaylorChannels.business.name,
-          channelDescription: TaylorChannels.business.description,
-          importance: urgent ? Importance.max : Importance.high,
-          priority: urgent ? Priority.max : Priority.high,
-          styleInformation: BigTextStyleInformation(body),
+      await _plugin.show(
+        _NotificationIds.business,
+        title,
+        body,
+        NotificationDetails(
+          android: AndroidNotificationDetails(
+            TaylorChannels.business.id,
+            TaylorChannels.business.name,
+            channelDescription: TaylorChannels.business.description,
+            importance: urgent ? Importance.max : Importance.high,
+            priority: urgent ? Priority.max : Priority.high,
+            styleInformation: BigTextStyleInformation(body),
+          ),
+          iOS: DarwinNotificationDetails(
+            interruptionLevel: urgent
+                ? InterruptionLevel.timeSensitive
+                : InterruptionLevel.active,
+          ),
         ),
-        iOS: DarwinNotificationDetails(
-          interruptionLevel: urgent
-              ? InterruptionLevel.timeSensitive
-              : InterruptionLevel.active,
-        ),
-      ),
-      payload: const NotificationPayload(
-        action: NotificationAction.openBusinessTonight,
-      ).encode(),
-    );
+        payload: const NotificationPayload(
+          action: NotificationAction.openBusinessTonight,
+        ).encode(),
+      );
+    });
   }
 
   @visibleForTesting
-  Future<void> cancelAll() => _plugin.cancelAll();
+  Future<void> cancelAll() => _safely(_plugin.cancelAll);
 }
 
 /// Identificadores fijos por tipo.

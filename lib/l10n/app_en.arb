@@ -357,5 +357,36 @@
   "chatQuickComingOut": "Coming out now",
   "chatQuickTwoMinutes": "Give me 2 minutes",
   "chatQuickWhereAreYou": "Where are you?",
-  "chatQuickThanks": "Thank you!"
+  "chatQuickThanks": "Thank you!",
+
+  "tripCompleted": "You've arrived",
+  "rateTitle": "How was your ride?",
+  "rateWith": "with {name}",
+  "@rateWith": { "placeholders": { "name": { "type": "String" } } },
+  "rateCommentHint": "Tell us more (optional)",
+  "rateSubmit": "Submit rating",
+  "rateSkip": "Not now",
+  "rateThanks": "Thanks for rating",
+  "rateTagPunctual": "On time",
+  "rateTagFriendly": "Friendly",
+  "rateTagSafeDriving": "Safe driving",
+  "rateTagCleanCar": "Clean car",
+  "rateTagComfortable": "I felt comfortable",
+  "rateSafetyTitle": "Did something happen we should know about?",
+  "rateSafetyBody": "If you felt unsafe at any point, tell us. Our safety team reviews it — not an algorithm.",
+  "rateSafetyReport": "Report to safety",
+  "rateSafetySent": "Received. Our team will review it and get in touch.",
+
+  "receiptTitle": "Receipt",
+  "receiptBase": "Base fare",
+  "receiptDistance": "Distance ({km} km)",
+  "@receiptDistance": { "placeholders": { "km": { "type": "String" } } },
+  "receiptTime": "Time ({minutes} min)",
+  "@receiptTime": { "placeholders": { "minutes": { "type": "int" } } },
+  "receiptTotal": "Total",
+  "receiptPaidWith": "Paid with",
+  "receiptViewReceipt": "View receipt",
+  "receiptShare": "Share receipt",
+
+  "driveRatePassenger": "How was your passenger?"
 }

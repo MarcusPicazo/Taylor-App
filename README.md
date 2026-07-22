@@ -430,7 +430,29 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
   y **es el bloqueador real para lanzar el modo conductora**.
 
 **No empezado**
-- Chat entre pasajera y conductora.
-- Calificación mutua al terminar el viaje.
 - Modo "seguir conduciendo" con encadenado de viajes.
-- Tests.
+- Materialización de series B2B: las programaciones de Agenda no generan
+  todavía los traslados de cada noche.
+- Cobertura de tests más allá del ciclo de vida del viaje y los Lottie.
+
+## Cierre de viaje
+
+El ciclo de la pasajera va `searching → driverAssigned → driverArriving →
+inProgress → completed`, y **el viaje sigue siendo el viaje activo después de
+llegar**: es la calificación —o descartarla— lo que lo cierra, no la llegada al
+destino. Esa distinción es la que permite mostrar la tarjeta de calificación
+sin haber perdido ya los datos del trayecto.
+
+### Una calificación baja es una señal de seguridad
+
+A partir de 3 estrellas o menos, la tarjeta ofrece explícitamente escalar a
+seguridad en lugar de limitarse a bajar un promedio. En una plataforma cuyo
+argumento es la seguridad, la calificación es el único canal estructurado por
+el que alguien puede decir que algo salió mal.
+
+El texto dice que lo revisa un equipo humano y no un algoritmo porque es
+verdad, y porque es exactamente la diferencia que la marca promete. **Si algún
+día deja de ser verdad, hay que cambiar el texto** — no al revés.
+
+Las etiquetas positivas se limpian al bajar la calificación: enviar "amable" y
+2 estrellas a la vez es una señal contradictoria que nadie sabría interpretar.

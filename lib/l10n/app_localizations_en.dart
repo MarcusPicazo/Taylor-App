@@ -952,4 +952,87 @@ class L10nEn extends L10n {
 
   @override
   String get chatQuickThanks => 'Thank you!';
+
+  @override
+  String get tripCompleted => 'You\'ve arrived';
+
+  @override
+  String get rateTitle => 'How was your ride?';
+
+  @override
+  String rateWith(String name) {
+    return 'with $name';
+  }
+
+  @override
+  String get rateCommentHint => 'Tell us more (optional)';
+
+  @override
+  String get rateSubmit => 'Submit rating';
+
+  @override
+  String get rateSkip => 'Not now';
+
+  @override
+  String get rateThanks => 'Thanks for rating';
+
+  @override
+  String get rateTagPunctual => 'On time';
+
+  @override
+  String get rateTagFriendly => 'Friendly';
+
+  @override
+  String get rateTagSafeDriving => 'Safe driving';
+
+  @override
+  String get rateTagCleanCar => 'Clean car';
+
+  @override
+  String get rateTagComfortable => 'I felt comfortable';
+
+  @override
+  String get rateSafetyTitle => 'Did something happen we should know about?';
+
+  @override
+  String get rateSafetyBody =>
+      'If you felt unsafe at any point, tell us. Our safety team reviews it — not an algorithm.';
+
+  @override
+  String get rateSafetyReport => 'Report to safety';
+
+  @override
+  String get rateSafetySent =>
+      'Received. Our team will review it and get in touch.';
+
+  @override
+  String get receiptTitle => 'Receipt';
+
+  @override
+  String get receiptBase => 'Base fare';
+
+  @override
+  String receiptDistance(String km) {
+    return 'Distance ($km km)';
+  }
+
+  @override
+  String receiptTime(int minutes) {
+    return 'Time ($minutes min)';
+  }
+
+  @override
+  String get receiptTotal => 'Total';
+
+  @override
+  String get receiptPaidWith => 'Paid with';
+
+  @override
+  String get receiptViewReceipt => 'View receipt';
+
+  @override
+  String get receiptShare => 'Share receipt';
+
+  @override
+  String get driveRatePassenger => 'How was your passenger?';
 }
