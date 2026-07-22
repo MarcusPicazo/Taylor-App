@@ -80,6 +80,25 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+
+# Genera los iconos de ambas plataformas desde un solo PNG.
+# Regenerar con:  dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/app_icon.png"
+
+  # Android adaptativo: el sistema recorta la capa de primer plano hasta un
+  # 66% del lienzo y la anima por separado del fondo. Por eso la 't' del
+  # foreground va más pequeña que la del icono completo — si se usara la
+  # misma, el gancho inferior quedaría cortado en los launchers circulares.
+  adaptive_icon_background: "#FF3E81"
+  adaptive_icon_foreground: "assets/images/app_icon_foreground.png"
+
+  # iOS no admite transparencia en el icono de la App Store: rechaza el
+  # binario en la subida si el PNG tiene canal alfa.
+  remove_alpha_ios: true
 
 flutter:
   uses-material-design: true

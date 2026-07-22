@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Modify this file to customize your launch splash screen -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@android:color/white" />
+<!--
+  Pantalla nativa de arranque.
 
-    <!-- You can insert your own image assets here -->
-    <!-- <item>
-        <bitmap
-            android:gravity="center"
-            android:src="@mipmap/launch_image" />
-    </item> -->
+  Es lo que Android dibuja ANTES de que Flutter tenga nada que mostrar. El
+  template la deja en blanco, lo que producía un parpadeo blanco → rosa al
+  entrar en nuestro splash animado.
+
+  Pintándola con el rosa de marca la transición desaparece: la app parece
+  abrir directamente en Taylor. Este color debe coincidir con
+  TaylorColors.raspberry (#FF3E81) del splash de Dart.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/taylor_raspberry" />
 </layer-list>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Fondo del icono adaptativo. Lo genera flutter_launcher_icons a
+         partir de adaptive_icon_background en pubspec.yaml. -->
+    <color name="ic_launcher_background">#FF3E81</color>
+
+    <!-- Raspberry Pink de marca, para la pantalla nativa de arranque.
+         Debe coincidir con TaylorColors.raspberry. -->
+    <color name="taylor_raspberry">#FF3E81</color>
+</resources>
