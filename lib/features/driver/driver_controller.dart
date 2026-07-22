@@ -96,7 +96,16 @@ class DriverState {
 /// llegue, `_scheduleIncomingRequest` se reemplaza por una suscripción push y
 /// el resto de la clase no cambia.
 class DriverController extends StateNotifier<DriverState> {
-  DriverController() : super(const DriverState());
+  DriverController({
+    this.dispatchDelay = const Duration(seconds: 3),
+  }) : super(const DriverState());
+
+  /// Cuánto tarda en llegar una solicitud tras ponerse en línea.
+  ///
+  /// Es un parámetro y no una constante para que los tests puedan reducirlo:
+  /// esperar tres segundos reales por caso convertiría la suite en algo que
+  /// nadie ejecuta. En producción se usa el valor por defecto.
+  final Duration dispatchDelay;
 
   Timer? _dispatchTimer;
   Timer? _expiryTimer;
@@ -137,7 +146,7 @@ class DriverController extends StateNotifier<DriverState> {
   void _scheduleIncomingRequest() {
     _dispatchTimer?.cancel();
 
-    _dispatchTimer = Timer(const Duration(seconds: 3), () {
+    _dispatchTimer = Timer(dispatchDelay, () {
       // No interrumpir un viaje en curso con una solicitud nueva.
       if (!state.isOnline || state.hasActiveTrip) return;
 

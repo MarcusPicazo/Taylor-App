@@ -432,7 +432,42 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
 
 **No empezado**
 - Modo "seguir conduciendo" con encadenado de viajes.
-- Cobertura de tests más allá del ciclo de viaje, el materializador y los Lottie.
+- Viajes programados en la pestaña Viajes (`l10n.tripsUpcoming` existe sin usar).
+- Tests de widget de las pantallas; hoy se cubren los controladores.
+
+## Tests
+
+```bash
+flutter test
+```
+
+76 tests. Mientras no se pueda verificar en dispositivo físico, son el
+sustituto — y han pagado su coste: destaparon tres bugs reales que ninguna
+pantalla mostraba.
+
+| Archivo | Cubre |
+|---|---|
+| `session_controller_test` | Login demo y B2B, embudo de verificación, perfil |
+| `driver_controller_test` | Disponibilidad, solicitudes, fases del viaje |
+| `business_controller_test` | Padrón, programaciones, fusión de traslados |
+| `chat_controller_test` | Aislamiento del chat por viaje |
+| `ride_lifecycle_test` | Ciclo del viaje de pasajera |
+| `ride_materializer_test` | Series recurrentes → traslados, conflictos |
+| `verification_stage_test` | Monotonía del embudo |
+| `accessibility_test` | Contraste, áreas táctiles, etiquetas |
+| `lottie_asset_test` | Que los Lottie parsean |
+
+### Dos cosas que aprendimos escribiéndolos
+
+**Los fallos silenciosos son el patrón dominante de este proyecto.** Ninguno de
+los tres bugs encontrados producía un error visible: el viaje se quedaba
+esperando, el interruptor no respondía, la notificación no salía. Por eso los
+tests apuntan a invariantes de estado y no a "no lanza excepción".
+
+**Nada de lo que rodea al flujo principal puede tumbarlo.** Una excepción del
+plugin de notificaciones rompía la máquina de estados del viaje. La regla
+resultante —las notificaciones son una mejora, nunca un requisito— está
+implementada en `TaylorNotifications`, que garantiza no lanzar nunca.
 
 ## Accesibilidad
 
