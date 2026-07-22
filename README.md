@@ -416,9 +416,10 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
 - Los traslados de la noche avanzan por temporizador en `TonightRidesController`.
   Sustituir por un stream de Firestore; `tonightSummaryProvider` y las pantallas
   no cambian.
-- La generación de traslados a partir de las series recurrentes no existe: hoy
-  `tonightRides()` viene de datos de demostración. Falta el job que, cada día,
-  materialice las series activas en traslados reales.
+- Los traslados ya se **materializan** desde las series de la Agenda
+  (`RideMaterializer`), pero quien la invoca es la app al iniciar sesión. En
+  producción hace falta un job diario en el servidor que los genere aunque
+  nadie abra la app — hoy, si la coordinadora no entra, no existen.
 - Facturas: la fila existe pero no descarga nada.
 
 **Notificaciones: presentación lista, transporte pendiente**
@@ -431,9 +432,37 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
 
 **No empezado**
 - Modo "seguir conduciendo" con encadenado de viajes.
-- Materialización de series B2B: las programaciones de Agenda no generan
-  todavía los traslados de cada noche.
-- Cobertura de tests más allá del ciclo de vida del viaje y los Lottie.
+- Cobertura de tests más allá del ciclo de viaje, el materializador y los Lottie.
+
+## Materialización de traslados B2B
+
+`RideMaterializer` convierte las programaciones recurrentes de la Agenda
+("lunes a viernes a las 22:00") en los traslados concretos de un día. Es una
+función **pura y determinista**, y eso importa por dos razones:
+
+- **Idempotencia.** Los identificadores se derivan de (fecha, serie, empleada),
+  no se generan al azar. Volver a materializar la misma noche —al abrir la app,
+  tras editar una serie, al volver de segundo plano— produce los mismos ids, y
+  `TonightRidesController.materialize` fusiona en vez de reemplazar. Un
+  traslado que ya va en camino conserva su estado.
+- **Testabilidad.** Es lógica de negocio con casos límite reales, cubierta por
+  12 tests.
+
+### Una empleada en dos programaciones
+
+No se resuelve en silencio. Gana la salida más temprana —llegar antes a casa
+nunca es peor— pero el conflicto se **reporta** y se notifica a la
+coordinadora: es ella quien sabe cuál de las dos series es la correcta, y
+necesita poder corregir la Agenda.
+
+Descartar uno de los traslados sin avisar la dejaría creyendo que alguien
+tiene transporte a una hora que no es.
+
+### Bajas de empleadas
+
+El filtro de empleadas activas se aplica **en la materialización**, no después.
+Una empleada dada de baja a media noche conserva el traslado que ya tenía en
+marcha; simplemente no se le genera uno nuevo al día siguiente.
 
 ## Cierre de viaje
 

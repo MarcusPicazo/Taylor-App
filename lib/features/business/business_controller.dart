@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/notifications/taylor_notifications.dart';
 import '../../data/models/business_account.dart';
+import 'ride_materializer.dart';
 
 /// Cuenta empresarial activa.
 final businessAccountProvider =
@@ -119,9 +120,61 @@ class TonightRidesController extends StateNotifier<List<EmployeeRide>> {
 
   Timer? _ticker;
 
+  /// Conflictos detectados en la última materialización.
+  List<ScheduleConflict> conflicts = const [];
+
   void load(List<EmployeeRide> rides) {
     state = rides;
     _startSimulation();
+  }
+
+  /// Genera los traslados de [date] a partir de las programaciones de la
+  /// empresa y los fusiona con los que ya existen.
+  ///
+  /// **Fusiona, no reemplaza.** Puede ejecutarse varias veces la misma noche
+  /// —al abrir la app, tras editar una serie, al volver de segundo plano— y
+  /// un traslado que ya va en camino debe conservar su estado. Solo se añaden
+  /// los que aún no existían; de ahí que el materializador genere ids
+  /// deterministas.
+  void materialize({
+    required BusinessAccount account,
+    required DateTime date,
+    List<EmployeeRide> Function(List<EmployeeRide>)? decorate,
+  }) {
+    final result = RideMaterializer.materialize(account: account, date: date);
+    conflicts = result.conflicts;
+
+    final existing = {for (final ride in state) ride.id: ride};
+
+    // `decorate` solo lo usa el modo demostración para repartir estados
+    // iniciales. En producción no se pasa y los traslados nacen en
+    // `scheduled`, como debe ser.
+    final fresh = decorate == null ? result.rides : decorate(result.rides);
+
+    state = [
+      for (final ride in fresh) existing[ride.id] ?? ride,
+    ];
+
+    if (result.hasConflicts) _notifyConflicts(result.conflicts);
+
+    _startSimulation();
+  }
+
+  /// Avisa a la coordinadora de que una empleada está en dos programaciones.
+  ///
+  /// Se notifica en lugar de resolverlo callando: ella es quien sabe cuál de
+  /// las dos series es la correcta, y tiene que poder corregir la Agenda.
+  void _notifyConflicts(List<ScheduleConflict> conflicts) {
+    final names = conflicts.map((c) => c.employee.name).join(', ');
+
+    TaylorNotifications.instance.showBusinessAlert(
+      title: conflicts.length == 1
+          ? 'Conflicto de programación'
+          : '${conflicts.length} conflictos de programación',
+      body: '$names está en más de una programación esta noche. '
+          'Asignamos la salida más temprana; revisa la Agenda.',
+      urgent: true,
+    );
   }
 
   /// Hace avanzar un traslado abierto cada pocos segundos, para que el panel
@@ -129,7 +182,12 @@ class TonightRidesController extends StateNotifier<List<EmployeeRide>> {
   void _startSimulation() {
     _ticker?.cancel();
     _ticker = Timer.periodic(const Duration(seconds: 6), (_) {
-      final open = state.where((r) => r.status.isOpen).toList();
+      // Programado también cuenta como pendiente de avanzar: es el estado en
+      // el que nacen los traslados recién materializados.
+      final open = state
+          .where((r) =>
+              r.status.isOpen || r.status == EmployeeRideStatus.scheduled)
+          .toList();
       if (open.isEmpty) {
         _ticker?.cancel();
         return;
@@ -192,6 +250,11 @@ class TonightRidesController extends StateNotifier<List<EmployeeRide>> {
   }
 
   EmployeeRide _advance(EmployeeRide ride) => switch (ride.status) {
+        // El despacho arranca cuando se acerca la hora de salida. En
+        // producción lo dispara el backend; aquí encadena con el resto de la
+        // simulación.
+        EmployeeRideStatus.scheduled =>
+          ride.copyWith(status: EmployeeRideStatus.assigning),
         EmployeeRideStatus.assigning => ride.copyWith(
             status: EmployeeRideStatus.driverAssigned,
             driverName: 'Ana Lucía M.',

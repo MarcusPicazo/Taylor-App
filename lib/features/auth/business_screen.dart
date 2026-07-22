@@ -36,12 +36,18 @@ class _BusinessScreenState extends ConsumerState<BusinessScreen> {
 
     if (!ok) return;
 
-    // Cargar la empresa y los traslados de la noche antes de que el router
-    // navegue, para que el panel no aparezca vacío durante un frame.
-    ref.read(businessAccountProvider.notifier).load(
-          TaylorDemo.businessAccount(),
+    // Cargar la empresa y materializar los traslados de la noche antes de que
+    // el router navegue, para que el panel no aparezca vacío durante un frame.
+    final account = TaylorDemo.businessAccount();
+    ref.read(businessAccountProvider.notifier).load(account);
+
+    // Los traslados salen de las programaciones reales de la Agenda, no de
+    // una lista fija: editar una serie cambia lo que se ve en "Hoy".
+    ref.read(tonightRidesProvider.notifier).materialize(
+          account: account,
+          date: DateTime.now(),
+          decorate: TaylorDemo.withDemoProgress,
         );
-    ref.read(tonightRidesProvider.notifier).load(TaylorDemo.tonightRides());
     ref.read(appModeProvider.notifier).state = AppMode.business;
   }
 

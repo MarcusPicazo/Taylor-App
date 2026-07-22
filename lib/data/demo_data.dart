@@ -149,56 +149,38 @@ abstract final class TaylorDemo {
     );
   }
 
-  /// Traslados de esta noche, en distintos estados.
+  /// Adelanta algunos traslados recién materializados, solo para exhibición.
   ///
-  /// La mezcla es deliberada: una ya llegó, dos van en camino, una sin
-  /// asignar y una que no se presentó. Enseña de un vistazo para qué sirve el
-  /// panel, en lugar de una lista uniforme que no comunica nada.
-  static List<EmployeeRide> tonightRides() {
+  /// Los traslados reales nacen todos en `scheduled` y la simulación los va
+  /// avanzando de uno en uno. Eso es correcto, pero deja el panel uniforme
+  /// durante el primer medio minuto — justo cuando alguien se lo está
+  /// enseñando a un cliente.
+  ///
+  /// Esta función reparte estados para que el panel comunique desde el primer
+  /// segundo para qué sirve: una ya llegó, una va en camino, otra sin asignar
+  /// y una que no se presentó. **No toca la materialización**: opera sobre lo
+  /// que esta produjo.
+  static List<EmployeeRide> withDemoProgress(List<EmployeeRide> rides) {
+    if (rides.isEmpty) return rides;
+
     final now = DateTime.now();
-    final pickup = DateTime(now.year, now.month, now.day, 22);
 
     return [
-      EmployeeRide(
-        id: 'ride1',
-        employee: _employees[0],
-        status: EmployeeRideStatus.arrived,
-        scheduledFor: pickup,
-        driverName: 'Ana Lucía M.',
-        arrivedAt: now.subtract(const Duration(minutes: 12)),
-        fare: 168.00,
-      ),
-      EmployeeRide(
-        id: 'ride2',
-        employee: _employees[1],
-        status: EmployeeRideStatus.inTransit,
-        scheduledFor: pickup,
-        driverName: 'Regina C.',
-        etaMinutes: 14,
-        fare: 142.00,
-      ),
-      EmployeeRide(
-        id: 'ride3',
-        employee: _employees[2],
-        status: EmployeeRideStatus.driverAssigned,
-        scheduledFor: pickup,
-        driverName: 'Mariana T.',
-        etaMinutes: 3,
-        fare: 195.00,
-      ),
-      EmployeeRide(
-        id: 'ride4',
-        employee: _employees[4],
-        status: EmployeeRideStatus.assigning,
-        scheduledFor: pickup,
-        fare: 210.00,
-      ),
-      EmployeeRide(
-        id: 'ride5',
-        employee: _employees[3],
-        status: EmployeeRideStatus.noShow,
-        scheduledFor: pickup,
-      ),
+      for (var i = 0; i < rides.length; i++)
+        switch (i % 4) {
+          0 => rides[i].copyWith(
+              status: EmployeeRideStatus.arrived,
+              driverName: 'Ana Lucía M.',
+              arrivedAt: now.subtract(const Duration(minutes: 12)),
+            ),
+          1 => rides[i].copyWith(
+              status: EmployeeRideStatus.inTransit,
+              driverName: 'Regina C.',
+              etaMinutes: 14,
+            ),
+          2 => rides[i].copyWith(status: EmployeeRideStatus.assigning),
+          _ => rides[i].copyWith(status: EmployeeRideStatus.noShow),
+        },
     ];
   }
 
