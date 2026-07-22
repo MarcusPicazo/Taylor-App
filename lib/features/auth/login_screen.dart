@@ -35,16 +35,19 @@ class LoginScreen extends ConsumerWidget {
             top: 0,
             left: 0,
             right: 0,
-            height: MediaQuery.sizeOf(context).height * 0.52,
+            height: MediaQuery.sizeOf(context).height * 0.44,
             child: const DecoratedBox(
               decoration: BoxDecoration(gradient: TaylorColors.brandGradient),
             ),
           ),
+          // El degradado debe terminar ANTES de donde empieza el texto oscuro.
+          // Antes se solapaban y "Bienvenida a Taylor" quedaba en 2.8:1 sobre
+          // el rosa residual, por debajo del 3.0 que exige el texto grande.
           Positioned(
-            top: MediaQuery.sizeOf(context).height * 0.30,
+            top: MediaQuery.sizeOf(context).height * 0.24,
             left: 0,
             right: 0,
-            height: MediaQuery.sizeOf(context).height * 0.24,
+            height: MediaQuery.sizeOf(context).height * 0.20,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -70,10 +73,15 @@ class LoginScreen extends ConsumerWidget {
 
                   const TaylorLogo(size: 64, color: TaylorColors.white),
                   const SizedBox(height: TaylorSpacing.sm),
+                  // Blanco puro y a tamaño de titular: sobre el rosa de marca,
+                  // el blanco da 3.4:1, que cumple para texto grande (3.0) pero
+                  // no para texto normal (4.5). Subir el tamaño es lo correcto
+                  // aquí — es un eslogan, no un párrafo.
                   Text(
                     l10n.appTagline,
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: TaylorColors.white.withValues(alpha: 0.92),
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: TaylorColors.white,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
@@ -198,8 +206,12 @@ class _BusinessEntry extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(TaylorRadius.md),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Container(
+        // 48 dp es el mínimo de área táctil de Android; iOS pide 44. El
+        // padding vertical anterior dejaba esta fila en 23 dp.
+        constraints: const BoxConstraints(minHeight: 48),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -214,7 +226,7 @@ class _BusinessEntry extends StatelessWidget {
             Text(
               label,
               style: theme.textTheme.labelLarge?.copyWith(
-                color: TaylorColors.raspberry,
+                color: TaylorColors.brandText,
               ),
             ),
           ],

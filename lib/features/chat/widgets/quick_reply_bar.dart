@@ -60,7 +60,7 @@ class QuickReplyBar extends StatelessWidget {
             label: Text(text),
             onPressed: () => onSelected(text),
             labelStyle: theme.textTheme.labelLarge?.copyWith(
-              color: TaylorColors.raspberry,
+              color: TaylorColors.brandText,
             ),
             backgroundColor: TaylorColors.raspberry.withValues(alpha: 0.08),
             side: BorderSide(

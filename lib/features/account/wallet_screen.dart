@@ -156,7 +156,7 @@ class _MethodTile extends StatelessWidget {
               child: Text(
                 defaultLabel,
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: TaylorColors.raspberry,
+                  color: TaylorColors.brandText,
                 ),
               ),
             )

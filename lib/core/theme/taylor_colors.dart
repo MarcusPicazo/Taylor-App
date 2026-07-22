@@ -11,6 +11,23 @@ abstract final class TaylorColors {
   /// Razzmatazz Red — acento profundo, para estados presionados y gradientes.
   static const Color razzmatazz = Color(0xFFD81B60);
 
+  /// El rosa de marca **para texto sobre superficies claras**.
+  ///
+  /// [raspberry] sobre blanco da un contraste de 3.36:1, por debajo del 4.5:1
+  /// que exige WCAG AA para texto de tamaño normal. Con él, frases como
+  /// "Llamar a la policía" quedaban por debajo del mínimo legible — justo el
+  /// texto que alguien necesita encontrar de noche y con prisa.
+  ///
+  /// [razzmatazz] da 5.4:1 y pasa. No es un color inventado para el parche: es
+  /// el segundo color oficial del brand book, y esto es exactamente para lo
+  /// que sirve.
+  ///
+  /// **Regla:** [raspberry] para rellenos, iconos grandes y texto grande;
+  /// [brandText] para texto de tamaño normal sobre fondo claro.
+  ///
+  /// Verificado por `test/accessibility_test.dart`.
+  static const Color brandText = razzmatazz;
+
   /// Obsidian Black — texto principal y superficies oscuras.
   static const Color obsidian = Color(0xFF1A1A1A);
 
@@ -19,7 +36,16 @@ abstract final class TaylorColors {
 
   // --- Neutros derivados -------------------------------------------------
   static const Color ink = Color(0xFF1A1A1A);
-  static const Color inkMuted = Color(0xFF6B6B6F);
+
+  /// Gris de texto secundario.
+  ///
+  /// Oscurecido desde #6B6B6F, que daba 4.17:1 sobre el lienzo y no llegaba
+  /// al 4.5:1 de WCAG AA. El texto secundario es donde más se cede contraste
+  /// "porque es secundario", y es precisamente donde viven las instrucciones.
+  static const Color inkMuted = Color(0xFF5C5C61);
+
+  /// Solo para elementos decorativos y placeholders: no alcanza el contraste
+  /// de texto y no debe usarse para contenido que haya que leer.
   static const Color inkFaint = Color(0xFF9A9AA0);
   static const Color hairline = Color(0x141A1A1A);
   static const Color canvas = Color(0xFFFAFAFB);

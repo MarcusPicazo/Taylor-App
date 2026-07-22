@@ -150,7 +150,7 @@ class DriverAssignedCard extends StatelessWidget {
                   child: Text(
                     l10n.driverArrivingIn(trip.durationMinutes ?? 4),
                     style: theme.textTheme.labelLarge?.copyWith(
-                      color: TaylorColors.raspberry,
+                      color: TaylorColors.brandText,
                     ),
                   ),
                 ),

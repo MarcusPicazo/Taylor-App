@@ -12,7 +12,10 @@ abstract final class TaylorTypography {
   /// Escala tipográfica. Títulos con tracking negativo para que se sientan
   /// densos y premium, cuerpo con tracking neutro para legibilidad.
   static TextTheme textTheme(Color onSurface) {
-    final muted = onSurface.withValues(alpha: 0.62);
+    // 0.62 daba 4.17:1 sobre el lienzo claro, por debajo del 4.5:1 de WCAG AA.
+    // El texto secundario es donde más se cede contraste "porque es
+    // secundario", y es donde viven las instrucciones.
+    final muted = onSurface.withValues(alpha: 0.74);
 
     return TextTheme(
       displayLarge: TextStyle(

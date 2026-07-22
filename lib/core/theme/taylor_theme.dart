@@ -113,8 +113,16 @@ abstract final class TaylorTheme {
 
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: TaylorColors.raspberry,
+          // brandText y no raspberry: el texto de un TextButton es de tamaño
+          // normal y sobre fondo claro. Ver TaylorColors.brandText.
+          foregroundColor:
+              isDark ? TaylorColors.raspberry : TaylorColors.brandText,
           textStyle: textTheme.labelLarge,
+          // WCAG y ambas plataformas piden 48/44 dp mínimos de área táctil.
+          // Los TextButton con etiquetas cortas se quedan por debajo si no se
+          // fuerza aquí.
+          minimumSize: const Size(48, 48),
+          tapTargetSize: MaterialTapTargetSize.padded,
         ),
       ),
 

@@ -434,6 +434,36 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
 - Modo "seguir conduciendo" con encadenado de viajes.
 - Cobertura de tests más allá del ciclo de viaje, el materializador y los Lottie.
 
+## Accesibilidad
+
+`test/accessibility_test.dart` verifica tres cosas sobre las pantallas
+principales, sin necesidad de dispositivo: que todo lo pulsable tenga etiqueta
+para lectores de pantalla, que las áreas táctiles alcancen 48 dp en Android y
+44 en iOS, y que el texto cumpla el contraste de WCAG AA.
+
+**Ejecuta estos tests antes de tocar colores.** Existen porque encontraron un
+problema real y sistémico que nadie habría visto a ojo.
+
+### El rosa de marca no sirve como color de texto
+
+`#FF3E81` sobre blanco da **3.36:1**. WCAG AA exige 4.5:1 para texto de tamaño
+normal. Estaba en botones de texto, chips y etiquetas — incluido *"Llamar a la
+policía"*, justo el texto que alguien necesita encontrar de noche y con prisa.
+
+La solución no fue cambiar la marca, sino usar el segundo color oficial del
+brand book, que da 5.4:1:
+
+| Color | Uso |
+|---|---|
+| `raspberry` `#FF3E81` | Rellenos, iconos, texto **grande** (≥24 px) |
+| `brandText` `#D81B60` | Texto de tamaño normal sobre fondo claro |
+
+La regla está documentada en `TaylorColors.brandText`. En modo oscuro se
+mantiene `raspberry`: sobre superficie oscura sí tiene contraste de sobra.
+
+Se ajustaron también el gris de texto secundario (4.17:1 → pasa) y el
+degradado del login, que se solapaba con el titular y lo dejaba en 2.8:1.
+
 ## Materialización de traslados B2B
 
 `RideMaterializer` convierte las programaciones recurrentes de la Agenda

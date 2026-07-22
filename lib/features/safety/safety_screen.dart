@@ -241,7 +241,7 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
                         child: Text(
                           contact.name[0],
                           style: theme.textTheme.labelLarge?.copyWith(
-                            color: TaylorColors.raspberry,
+                            color: TaylorColors.brandText,
                           ),
                         ),
                       ),

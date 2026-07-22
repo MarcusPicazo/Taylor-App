@@ -130,7 +130,7 @@ class _EmployeeTile extends StatelessWidget {
               child: Text(
                 employee.initials,
                 style: theme.textTheme.labelLarge?.copyWith(
-                  color: TaylorColors.raspberry,
+                  color: TaylorColors.brandText,
                 ),
               ),
             ),
