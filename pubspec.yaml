@@ -1,0 +1,102 @@
+name: taylor
+description: Taylor — la primera plataforma de movilidad exclusiva para mujeres.
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  # 3.6 es el mínimo real: el tema usa Color.withValues() y CardThemeData,
+  # ambos introducidos en Flutter 3.27 / Dart 3.6.
+  sdk: ">=3.6.0 <4.0.0"
+  flutter: ">=3.27.0"
+
+# Solo se declara lo que el código importa hoy.
+#
+# Firebase, ML Kit, cámara y geolocalización añaden dependencias nativas y
+# configuración de Gradle/Xcode que ahora mismo no aporta nada, porque esas
+# integraciones todavía están simuladas. Están listadas al final del archivo,
+# listas para descomentar cuando toque implementarlas.
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # State management
+  flutter_riverpod: ^2.5.1
+
+  # Routing + soft transitions
+  go_router: ^14.2.0
+
+  # Maps
+  google_maps_flutter: ^2.7.0
+
+  # Animations
+  lottie: ^3.1.2
+
+  # UI helpers
+  intl_phone_field: ^3.2.0
+  country_flags: ^3.1.0
+  url_launcher: ^6.3.0
+  share_plus: ^9.0.0
+  image_picker: ^1.1.2
+
+  # Notificaciones.
+  #
+  # flutter_local_notifications es la capa de PRESENTACIÓN: canales, prioridad,
+  # acciones, sonido. Funciona sin backend, así que el flujo completo se puede
+  # demostrar hoy. El TRANSPORTE remoto (FCM) se enchufa después sin tocar
+  # nada de esto — ver README → Activar push remoto.
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  permission_handler: ^11.3.1
+
+  # Storage / utils
+  shared_preferences: ^2.2.3
+  intl: any
+  uuid: ^4.4.2
+
+# --- Pendientes de integración ------------------------------------------
+# Descomentar junto con el código que las use, no antes.
+#
+#   # Backend (ver README → Configurar Firebase)
+#   firebase_core: ^3.3.0
+#   firebase_auth: ^5.1.4
+#   cloud_firestore: ^5.2.1
+#   firebase_storage: ^12.1.3
+#
+#   # Inicio de sesión social
+#   google_sign_in: ^6.2.1
+#   sign_in_with_apple: ^6.1.1
+#
+#   # Ubicación en vivo y geocodificación
+#   geolocator: ^12.0.0
+#   geocoding: ^3.0.0
+#
+#   # Verificación de identidad (documento + rostro)
+#   camera: ^0.11.0+2
+#   google_mlkit_face_detection: ^0.11.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+  assets:
+    - assets/images/
+    - assets/lottie/
+
+  fonts:
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Poppins-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Poppins-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
