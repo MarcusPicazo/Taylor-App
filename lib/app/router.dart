@@ -14,6 +14,7 @@ import '../features/auth/business_application_screen.dart';
 import '../features/auth/business_screen.dart';
 import '../features/business/business_account_screen.dart';
 import '../features/business/business_controller.dart';
+import '../features/chat/trip_chat_route.dart';
 import '../features/business/business_home_screen.dart';
 import '../features/business/business_schedule_screen.dart';
 import '../features/business/business_team_screen.dart';
@@ -64,6 +65,9 @@ abstract final class Routes {
   static const businessSchedule = '/business/schedule';
   static const businessTeam = '/business/team';
   static const businessAccount = '/business/account';
+
+  /// Chat del viaje activo. Se resuelve según el modo en curso.
+  static const chat = '/chat';
 
   /// Rutas que solo existen en modo conductora.
   static bool isDriverRoute(String location) => location.startsWith('/drive');
@@ -273,6 +277,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: Routes.driverApplication,
         builder: (context, state) => const DriverApplicationScreen(),
+      ),
+
+      // El chat resuelve por sí mismo a quién representa y con quién habla,
+      // leyendo el modo activo y el viaje en curso. Así el mismo destino
+      // sirve a pasajera y conductora sin duplicar rutas ni pasar argumentos
+      // que podrían quedar desincronizados.
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: Routes.chat,
+        builder: (context, state) => const TripChatRoute(),
       ),
     ],
   );

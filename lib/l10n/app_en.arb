@@ -340,5 +340,22 @@
 
   "bizBilling": "Billing",
   "bizInvoices": "Invoices",
-  "bizInvoicesBody": "Download your monthly statements"
+  "bizInvoicesBody": "Download your monthly statements",
+
+  "chatTitle": "Messages",
+  "chatTripOnly": "Trip chat",
+  "chatHint": "Type a message",
+  "chatEmpty": "No messages yet.\nUse a quick reply to start.",
+  "chatKeyboardLocked": "The keyboard is locked while you're driving. Use a quick reply, or pull over to type.",
+
+  "chatQuickOnMyWay": "On my way",
+  "chatQuickArrived": "I've arrived",
+  "chatQuickWaitingOutside": "Waiting outside",
+  "chatQuickCantFind": "I can't find the spot",
+  "chatQuickTraffic": "Traffic, running a bit late",
+
+  "chatQuickComingOut": "Coming out now",
+  "chatQuickTwoMinutes": "Give me 2 minutes",
+  "chatQuickWhereAreYou": "Where are you?",
+  "chatQuickThanks": "Thank you!"
 }

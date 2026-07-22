@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../app/router.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
@@ -87,10 +89,21 @@ class ActiveTripPanel extends StatelessWidget {
                   width: 60,
                   height: 56,
                   child: OutlinedButton(
-                    onPressed: () {},
-                    style: OutlinedButton.styleFrom(
-                      padding: EdgeInsets.zero,
+                    onPressed: () => context.push(Routes.chat),
+                    style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
+                    child: const Icon(
+                      Icons.chat_bubble_outline_rounded,
+                      size: 20,
                     ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                SizedBox(
+                  width: 60,
+                  height: 56,
+                  child: OutlinedButton(
+                    onPressed: () {},
+                    style: OutlinedButton.styleFrom(padding: EdgeInsets.zero),
                     child: const Icon(Icons.call_rounded, size: 21),
                   ),
                 ),

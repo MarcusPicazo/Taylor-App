@@ -340,5 +340,22 @@
 
   "bizBilling": "Facturación",
   "bizInvoices": "Facturas",
-  "bizInvoicesBody": "Descarga tus comprobantes mensuales"
+  "bizInvoicesBody": "Descarga tus comprobantes mensuales",
+
+  "chatTitle": "Mensajes",
+  "chatTripOnly": "Chat del viaje",
+  "chatHint": "Escribe un mensaje",
+  "chatEmpty": "Todavía no hay mensajes.\nUsa una respuesta rápida para empezar.",
+  "chatKeyboardLocked": "El teclado está bloqueado mientras conduces. Usa las respuestas rápidas o detente para escribir.",
+
+  "chatQuickOnMyWay": "Voy en camino",
+  "chatQuickArrived": "Ya llegué",
+  "chatQuickWaitingOutside": "Te espero afuera",
+  "chatQuickCantFind": "No encuentro el lugar",
+  "chatQuickTraffic": "Hay tráfico, tardo un poco",
+
+  "chatQuickComingOut": "Ya salgo",
+  "chatQuickTwoMinutes": "Dame 2 minutos",
+  "chatQuickWhereAreYou": "¿Dónde estás?",
+  "chatQuickThanks": "¡Gracias!"
 }

@@ -909,4 +909,47 @@ class L10nEn extends L10n {
 
   @override
   String get bizInvoicesBody => 'Download your monthly statements';
+
+  @override
+  String get chatTitle => 'Messages';
+
+  @override
+  String get chatTripOnly => 'Trip chat';
+
+  @override
+  String get chatHint => 'Type a message';
+
+  @override
+  String get chatEmpty => 'No messages yet.\nUse a quick reply to start.';
+
+  @override
+  String get chatKeyboardLocked =>
+      'The keyboard is locked while you\'re driving. Use a quick reply, or pull over to type.';
+
+  @override
+  String get chatQuickOnMyWay => 'On my way';
+
+  @override
+  String get chatQuickArrived => 'I\'ve arrived';
+
+  @override
+  String get chatQuickWaitingOutside => 'Waiting outside';
+
+  @override
+  String get chatQuickCantFind => 'I can\'t find the spot';
+
+  @override
+  String get chatQuickTraffic => 'Traffic, running a bit late';
+
+  @override
+  String get chatQuickComingOut => 'Coming out now';
+
+  @override
+  String get chatQuickTwoMinutes => 'Give me 2 minutes';
+
+  @override
+  String get chatQuickWhereAreYou => 'Where are you?';
+
+  @override
+  String get chatQuickThanks => 'Thank you!';
 }

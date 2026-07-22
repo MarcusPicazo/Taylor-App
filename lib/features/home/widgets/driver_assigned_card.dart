@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../../app/router.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
@@ -171,7 +173,7 @@ class DriverAssignedCard extends StatelessWidget {
                   child: _ActionChip(
                     icon: Icons.chat_bubble_outline_rounded,
                     label: l10n.messageDriver,
-                    onTap: () {},
+                    onTap: () => context.push(Routes.chat),
                   ),
                 ),
                 const SizedBox(width: 8),

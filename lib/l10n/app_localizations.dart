@@ -1728,6 +1728,90 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'Descarga tus comprobantes mensuales'**
   String get bizInvoicesBody;
+
+  /// No description provided for @chatTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Mensajes'**
+  String get chatTitle;
+
+  /// No description provided for @chatTripOnly.
+  ///
+  /// In es, this message translates to:
+  /// **'Chat del viaje'**
+  String get chatTripOnly;
+
+  /// No description provided for @chatHint.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe un mensaje'**
+  String get chatHint;
+
+  /// No description provided for @chatEmpty.
+  ///
+  /// In es, this message translates to:
+  /// **'Todavía no hay mensajes.\nUsa una respuesta rápida para empezar.'**
+  String get chatEmpty;
+
+  /// No description provided for @chatKeyboardLocked.
+  ///
+  /// In es, this message translates to:
+  /// **'El teclado está bloqueado mientras conduces. Usa las respuestas rápidas o detente para escribir.'**
+  String get chatKeyboardLocked;
+
+  /// No description provided for @chatQuickOnMyWay.
+  ///
+  /// In es, this message translates to:
+  /// **'Voy en camino'**
+  String get chatQuickOnMyWay;
+
+  /// No description provided for @chatQuickArrived.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya llegué'**
+  String get chatQuickArrived;
+
+  /// No description provided for @chatQuickWaitingOutside.
+  ///
+  /// In es, this message translates to:
+  /// **'Te espero afuera'**
+  String get chatQuickWaitingOutside;
+
+  /// No description provided for @chatQuickCantFind.
+  ///
+  /// In es, this message translates to:
+  /// **'No encuentro el lugar'**
+  String get chatQuickCantFind;
+
+  /// No description provided for @chatQuickTraffic.
+  ///
+  /// In es, this message translates to:
+  /// **'Hay tráfico, tardo un poco'**
+  String get chatQuickTraffic;
+
+  /// No description provided for @chatQuickComingOut.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya salgo'**
+  String get chatQuickComingOut;
+
+  /// No description provided for @chatQuickTwoMinutes.
+  ///
+  /// In es, this message translates to:
+  /// **'Dame 2 minutos'**
+  String get chatQuickTwoMinutes;
+
+  /// No description provided for @chatQuickWhereAreYou.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Dónde estás?'**
+  String get chatQuickWhereAreYou;
+
+  /// No description provided for @chatQuickThanks.
+  ///
+  /// In es, this message translates to:
+  /// **'¡Gracias!'**
+  String get chatQuickThanks;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {
