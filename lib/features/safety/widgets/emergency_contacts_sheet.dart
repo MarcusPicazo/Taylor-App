@@ -10,9 +10,10 @@ import '../../../l10n/app_localizations.dart';
 
 /// Alta de un contacto de confianza.
 ///
-/// Se pide en el registro y se puede ampliar después: una cuenta sin contactos
-/// deja la mitad de la pestaña de Seguridad sin sentido, así que la app insiste
-/// en tener al menos uno.
+/// Se usa en dos sitios: el paso de red de confianza del onboarding y la
+/// pestaña de Seguridad. El registro lo pide con fuerza pero permite saltarlo
+/// —ver `EmergencyContactStep` para el razonamiento—, así que hay cuentas que
+/// llegan a la app sin contactos y la pestaña de Seguridad debe manejarlo.
 class EmergencyContactsSheet extends ConsumerStatefulWidget {
   const EmergencyContactsSheet({super.key});
 

@@ -388,5 +388,14 @@
   "receiptViewReceipt": "Ver recibo",
   "receiptShare": "Compartir recibo",
 
-  "driveRatePassenger": "¿Cómo estuvo la pasajera?"
+  "driveRatePassenger": "¿Cómo estuvo la pasajera?",
+
+  "stepContacts": "Tu red de confianza",
+  "stepContactsBody": "Agrega a alguien de confianza. Con un toque podrá ver dónde estás durante un viaje, y recibirá un aviso si pides ayuda.",
+  "stepContactsAdd": "Agregar contacto",
+  "stepContactsAdded": "{name} está en tu red",
+  "@stepContactsAdded": { "placeholders": { "name": { "type": "String" } } },
+  "stepContactsSkip": "No tengo a nadie ahora",
+  "stepContactsSkipNote": "Puedes agregarla después desde Seguridad. El botón de emergencia y la llamada a la policía funcionan igual sin contactos.",
+  "safetyNoContactsOnboarding": "Agrega un contacto de confianza para poder avisar a alguien durante un viaje."
 }

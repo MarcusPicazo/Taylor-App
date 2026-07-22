@@ -18,6 +18,13 @@ enum VerificationStage {
   /// Verificación de antecedentes en curso (asíncrona).
   backgroundCheckPending,
 
+  /// Red de confianza configurada (o rechazada explícitamente).
+  ///
+  /// Va al final del embudo a propósito. Para entonces la identidad ya está
+  /// confirmada y la usuaria está invertida en el proceso, así que el paso se
+  /// lee como "una última cosa, y es para ti" en lugar de como más trámite.
+  safetyNetworkReady,
+
   /// Puede usar la app.
   verified,
 
@@ -30,11 +37,12 @@ extension VerificationStageX on VerificationStage {
 
   /// Progreso 0..1 para las barras de onboarding.
   double get progress => switch (this) {
-        VerificationStage.registered => 0.15,
-        VerificationStage.phoneConfirmed => 0.35,
-        VerificationStage.documentCaptured => 0.55,
-        VerificationStage.biometricMatched => 0.8,
-        VerificationStage.backgroundCheckPending => 0.92,
+        VerificationStage.registered => 0.12,
+        VerificationStage.phoneConfirmed => 0.28,
+        VerificationStage.documentCaptured => 0.45,
+        VerificationStage.biometricMatched => 0.66,
+        VerificationStage.backgroundCheckPending => 0.84,
+        VerificationStage.safetyNetworkReady => 0.95,
         VerificationStage.verified => 1.0,
         VerificationStage.rejected => 1.0,
       };

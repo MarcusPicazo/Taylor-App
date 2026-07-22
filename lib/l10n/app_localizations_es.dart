@@ -1042,4 +1042,30 @@ class L10nEs extends L10n {
 
   @override
   String get driveRatePassenger => '¿Cómo estuvo la pasajera?';
+
+  @override
+  String get stepContacts => 'Tu red de confianza';
+
+  @override
+  String get stepContactsBody =>
+      'Agrega a alguien de confianza. Con un toque podrá ver dónde estás durante un viaje, y recibirá un aviso si pides ayuda.';
+
+  @override
+  String get stepContactsAdd => 'Agregar contacto';
+
+  @override
+  String stepContactsAdded(String name) {
+    return '$name está en tu red';
+  }
+
+  @override
+  String get stepContactsSkip => 'No tengo a nadie ahora';
+
+  @override
+  String get stepContactsSkipNote =>
+      'Puedes agregarla después desde Seguridad. El botón de emergencia y la llamada a la policía funcionan igual sin contactos.';
+
+  @override
+  String get safetyNoContactsOnboarding =>
+      'Agrega un contacto de confianza para poder avisar a alguien durante un viaje.';
 }

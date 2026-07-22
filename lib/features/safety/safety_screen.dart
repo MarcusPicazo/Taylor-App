@@ -182,16 +182,51 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
             ),
             const SizedBox(height: 4),
 
+            // Una cuenta puede llegar aquí sin contactos: el paso del
+            // onboarding permite saltarse. El vacío no se presenta como un
+            // estado neutro sino como algo pendiente, porque sin contactos
+            // "Avisar a mis amigas" no hace nada.
             if (contacts.isEmpty)
               Container(
                 padding: const EdgeInsets.all(TaylorSpacing.md),
                 decoration: BoxDecoration(
+                  color: TaylorColors.caution.withValues(alpha: 0.09),
                   borderRadius: BorderRadius.circular(TaylorRadius.lg),
-                  border: Border.all(color: theme.colorScheme.outline),
+                  border: Border.all(
+                    color: TaylorColors.caution.withValues(alpha: 0.4),
+                  ),
                 ),
-                child: Text(
-                  l10n.safetyNoContacts,
-                  style: theme.textTheme.bodyMedium,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.info_outline_rounded,
+                      size: 20,
+                      color: TaylorColors.caution,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.safetyNoContacts,
+                            style: theme.textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            l10n.safetyNoContactsOnboarding,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                          const SizedBox(height: TaylorSpacing.sm),
+                          FilledButton(
+                            onPressed: _openContacts,
+                            child: Text(l10n.safetyAddContact),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               )
             else

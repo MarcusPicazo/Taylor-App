@@ -1962,6 +1962,48 @@ abstract class L10n {
   /// In es, this message translates to:
   /// **'¿Cómo estuvo la pasajera?'**
   String get driveRatePassenger;
+
+  /// No description provided for @stepContacts.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu red de confianza'**
+  String get stepContacts;
+
+  /// No description provided for @stepContactsBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega a alguien de confianza. Con un toque podrá ver dónde estás durante un viaje, y recibirá un aviso si pides ayuda.'**
+  String get stepContactsBody;
+
+  /// No description provided for @stepContactsAdd.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar contacto'**
+  String get stepContactsAdd;
+
+  /// No description provided for @stepContactsAdded.
+  ///
+  /// In es, this message translates to:
+  /// **'{name} está en tu red'**
+  String stepContactsAdded(String name);
+
+  /// No description provided for @stepContactsSkip.
+  ///
+  /// In es, this message translates to:
+  /// **'No tengo a nadie ahora'**
+  String get stepContactsSkip;
+
+  /// No description provided for @stepContactsSkipNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Puedes agregarla después desde Seguridad. El botón de emergencia y la llamada a la policía funcionan igual sin contactos.'**
+  String get stepContactsSkipNote;
+
+  /// No description provided for @safetyNoContactsOnboarding.
+  ///
+  /// In es, this message translates to:
+  /// **'Agrega un contacto de confianza para poder avisar a alguien durante un viaje.'**
+  String get safetyNoContactsOnboarding;
 }
 
 class _L10nDelegate extends LocalizationsDelegate<L10n> {

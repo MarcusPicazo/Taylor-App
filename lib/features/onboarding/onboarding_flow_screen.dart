@@ -8,6 +8,7 @@ import '../../data/session_controller.dart';
 import '../../l10n/app_localizations.dart';
 import 'steps/background_check_step.dart';
 import 'steps/document_scan_step.dart';
+import 'steps/emergency_contact_step.dart';
 import 'steps/face_match_step.dart';
 import 'steps/phone_step.dart';
 import 'steps/verified_step.dart';
@@ -125,6 +126,10 @@ class _OnboardingFlowScreenState extends ConsumerState<OnboardingFlowScreen> {
                   BackgroundCheckStep(
                     onDone: () =>
                         _advance(VerificationStage.backgroundCheckPending),
+                  ),
+                  EmergencyContactStep(
+                    onDone: () =>
+                        _advance(VerificationStage.safetyNetworkReady),
                   ),
                   VerifiedStep(
                     name: user.firstName,

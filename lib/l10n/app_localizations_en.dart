@@ -1035,4 +1035,30 @@ class L10nEn extends L10n {
 
   @override
   String get driveRatePassenger => 'How was your passenger?';
+
+  @override
+  String get stepContacts => 'Your trusted circle';
+
+  @override
+  String get stepContactsBody =>
+      'Add someone you trust. With one tap they\'ll be able to see where you are during a ride, and they\'ll be alerted if you ask for help.';
+
+  @override
+  String get stepContactsAdd => 'Add contact';
+
+  @override
+  String stepContactsAdded(String name) {
+    return '$name is in your circle';
+  }
+
+  @override
+  String get stepContactsSkip => 'I don\'t have anyone right now';
+
+  @override
+  String get stepContactsSkipNote =>
+      'You can add someone later from Safety. The emergency button and calling the police work the same without contacts.';
+
+  @override
+  String get safetyNoContactsOnboarding =>
+      'Add a trusted contact so you can alert someone during a ride.';
 }
