@@ -390,6 +390,23 @@
 
   "driveRatePassenger": "How was your passenger?",
 
+  "searchHint": "Where do you want to go?",
+  "searchPrompt": "Type an area, street or place",
+  "searchNoResults": "We couldn't find that place.\nTry another name.",
+  "tierArrivesIn": "Arrives in {minutes} min",
+  "@tierArrivesIn": { "placeholders": { "minutes": { "type": "int" } } },
+  "tripEstimate": "{km} km · about {minutes} min",
+  "@tripEstimate": {
+    "placeholders": {
+      "km": { "type": "String" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "confirmRide": "Confirm {tier}",
+  "@confirmRide": { "placeholders": { "tier": { "type": "String" } } },
+  "locationDenied": "Without location we can't center you on the map, but you can still type your destination.",
+  "locationOpenSettings": "Open settings",
+
   "stepContacts": "Your trusted circle",
   "stepContactsBody": "Add someone you trust. With one tap they'll be able to see where you are during a ride, and they'll be alerted if you ask for help.",
   "stepContactsAdd": "Add contact",

@@ -27,8 +27,9 @@ dependencies:
   # Routing + soft transitions
   go_router: ^14.2.0
 
-  # Maps
+  # Maps y ubicación
   google_maps_flutter: ^2.7.0
+  geolocator: ^12.0.0
 
   # Animations
   lottie: ^3.1.2
@@ -68,8 +69,7 @@ dependencies:
 #   google_sign_in: ^6.2.1
 #   sign_in_with_apple: ^6.1.1
 #
-#   # Ubicación en vivo y geocodificación
-#   geolocator: ^12.0.0
+#   # Geocodificación inversa (coordenada → dirección)
 #   geocoding: ^3.0.0
 #
 #   # Verificación de identidad (documento + rostro)

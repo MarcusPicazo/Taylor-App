@@ -1044,6 +1044,38 @@ class L10nEs extends L10n {
   String get driveRatePassenger => '¿Cómo estuvo la pasajera?';
 
   @override
+  String get searchHint => '¿A dónde quieres ir?';
+
+  @override
+  String get searchPrompt => 'Escribe una zona, calle o lugar';
+
+  @override
+  String get searchNoResults =>
+      'No encontramos ese lugar.\nIntenta con otro nombre.';
+
+  @override
+  String tierArrivesIn(int minutes) {
+    return 'Llega en $minutes min';
+  }
+
+  @override
+  String tripEstimate(String km, int minutes) {
+    return '$km km · $minutes min aprox.';
+  }
+
+  @override
+  String confirmRide(String tier) {
+    return 'Confirmar $tier';
+  }
+
+  @override
+  String get locationDenied =>
+      'Sin ubicación no podemos centrarte en el mapa, pero puedes escribir tu destino igual.';
+
+  @override
+  String get locationOpenSettings => 'Abrir ajustes';
+
+  @override
   String get stepContacts => 'Tu red de confianza';
 
   @override

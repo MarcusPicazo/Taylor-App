@@ -65,6 +65,16 @@ void main() {
     expect(formatted, anyOf(contains('128.50'), contains('128,50')));
   });
 
+  testWidgets('el símbolo va delante del importe', (tester) async {
+    final formatted = await formatIn(tester, const Locale('es'), 221);
+
+    // "221 $" es convención europea; en México el símbolo precede al número.
+    // Se comprobó en dispositivo: un locale de español genérico lo colocaba
+    // detrás.
+    expect(formatted.trim().startsWith(r'$'), isTrue,
+        reason: 'esperaba "\$221…", obtuve "$formatted"');
+  });
+
   testWidgets('la variante compacta omite los centavos', (tester) async {
     late String result;
 

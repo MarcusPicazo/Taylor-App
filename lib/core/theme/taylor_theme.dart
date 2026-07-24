@@ -184,11 +184,16 @@ abstract final class TaylorTheme {
   }
 }
 
-/// Transición global: la pantalla entrante se desliza apenas 6% del ancho y
-/// hace fade, mientras la saliente se hunde ligeramente en escala.
+/// Transición global entre pantallas.
 ///
-/// El desplazamiento corto es intencional — transiciones largas hacen que la
-/// app se sienta lenta, y el brand book exige "rendimiento de alto nivel".
+/// La entrante llega deslizándose desde la derecha mientras crece desde un 94 %
+/// y aparece; la saliente se aleja hacia el fondo y se atenúa. Las dos capas se
+/// mueven a la vez pero a distinta profundidad, que es lo que produce la
+/// sensación de una superficie pasando sobre otra en lugar de un corte.
+///
+/// El desplazamiento es corto (8 % del ancho) a propósito: recorridos largos
+/// hacen que la app se sienta lenta, y el brand book exige "rendimiento de alto
+/// nivel". Lo que da elegancia es la curva y la profundidad, no la distancia.
 class _SoftPageTransitionBuilder extends PageTransitionsBuilder {
   const _SoftPageTransitionBuilder();
 
@@ -208,18 +213,30 @@ class _SoftPageTransitionBuilder extends PageTransitionsBuilder {
     final exit = CurvedAnimation(
       parent: secondaryAnimation,
       curve: TaylorMotion.emphasized,
+      reverseCurve: Curves.easeInCubic,
     );
 
-    return FadeTransition(
-      opacity: enter,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0.06, 0),
-          end: Offset.zero,
-        ).animate(enter),
-        child: ScaleTransition(
-          scale: Tween<double>(begin: 1.0, end: 0.96).animate(exit),
-          child: child,
+    return SlideTransition(
+      // Capa saliente: retrocede un poco hacia la izquierda, como si la nueva
+      // pantalla la empujara.
+      position: Tween<Offset>(
+        begin: Offset.zero,
+        end: const Offset(-0.14, 0),
+      ).animate(exit),
+      child: ScaleTransition(
+        scale: Tween<double>(begin: 1, end: 0.94).animate(exit),
+        child: FadeTransition(
+          opacity: Tween<double>(begin: 1, end: 0.4).animate(exit),
+          child: SlideTransition(
+            position: Tween<Offset>(
+              begin: const Offset(0.08, 0),
+              end: Offset.zero,
+            ).animate(enter),
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.94, end: 1).animate(enter),
+              child: FadeTransition(opacity: enter, child: child),
+            ),
+          ),
         ),
       ),
     );

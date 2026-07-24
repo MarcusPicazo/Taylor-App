@@ -1963,6 +1963,54 @@ abstract class L10n {
   /// **'¿Cómo estuvo la pasajera?'**
   String get driveRatePassenger;
 
+  /// No description provided for @searchHint.
+  ///
+  /// In es, this message translates to:
+  /// **'¿A dónde quieres ir?'**
+  String get searchHint;
+
+  /// No description provided for @searchPrompt.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe una zona, calle o lugar'**
+  String get searchPrompt;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In es, this message translates to:
+  /// **'No encontramos ese lugar.\nIntenta con otro nombre.'**
+  String get searchNoResults;
+
+  /// No description provided for @tierArrivesIn.
+  ///
+  /// In es, this message translates to:
+  /// **'Llega en {minutes} min'**
+  String tierArrivesIn(int minutes);
+
+  /// No description provided for @tripEstimate.
+  ///
+  /// In es, this message translates to:
+  /// **'{km} km · {minutes} min aprox.'**
+  String tripEstimate(String km, int minutes);
+
+  /// No description provided for @confirmRide.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar {tier}'**
+  String confirmRide(String tier);
+
+  /// No description provided for @locationDenied.
+  ///
+  /// In es, this message translates to:
+  /// **'Sin ubicación no podemos centrarte en el mapa, pero puedes escribir tu destino igual.'**
+  String get locationDenied;
+
+  /// No description provided for @locationOpenSettings.
+  ///
+  /// In es, this message translates to:
+  /// **'Abrir ajustes'**
+  String get locationOpenSettings;
+
   /// No description provided for @stepContacts.
   ///
   /// In es, this message translates to:

@@ -390,6 +390,23 @@
 
   "driveRatePassenger": "¿Cómo estuvo la pasajera?",
 
+  "searchHint": "¿A dónde quieres ir?",
+  "searchPrompt": "Escribe una zona, calle o lugar",
+  "searchNoResults": "No encontramos ese lugar.\nIntenta con otro nombre.",
+  "tierArrivesIn": "Llega en {minutes} min",
+  "@tierArrivesIn": { "placeholders": { "minutes": { "type": "int" } } },
+  "tripEstimate": "{km} km · {minutes} min aprox.",
+  "@tripEstimate": {
+    "placeholders": {
+      "km": { "type": "String" },
+      "minutes": { "type": "int" }
+    }
+  },
+  "confirmRide": "Confirmar {tier}",
+  "@confirmRide": { "placeholders": { "tier": { "type": "String" } } },
+  "locationDenied": "Sin ubicación no podemos centrarte en el mapa, pero puedes escribir tu destino igual.",
+  "locationOpenSettings": "Abrir ajustes",
+
   "stepContacts": "Tu red de confianza",
   "stepContactsBody": "Agrega a alguien de confianza. Con un toque podrá ver dónde estás durante un viaje, y recibirá un aviso si pides ayuda.",
   "stepContactsAdd": "Agregar contacto",

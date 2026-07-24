@@ -19,20 +19,31 @@ abstract final class Money {
   static const String currencyCode = 'MXN';
   static const String currencySymbol = r'$';
 
-  /// Formatea un importe con el símbolo del mercado, usando las convenciones
-  /// de separadores del idioma activo.
+  /// Locale de formato monetario.
+  ///
+  /// Fijo, y por la misma razón que la divisa: **la posición del símbolo
+  /// también es del mercado**. Un locale de "español genérico" coloca el
+  /// símbolo detrás —"221 $", convención europea— cuando en México va delante,
+  /// "$221". Formatear con `es_MX` produce la convención correcta sin importar
+  /// en qué idioma esté la interfaz.
+  static const String _marketLocale = 'es_MX';
+
+  /// Importe con dos decimales: "$128.50".
   static String format(BuildContext context, num amount) {
     return NumberFormat.currency(
-      locale: Localizations.localeOf(context).toLanguageTag(),
+      locale: _marketLocale,
       symbol: currencySymbol,
       decimalDigits: 2,
     ).format(amount);
   }
 
-  /// Variante sin decimales, para cifras grandes donde los centavos son ruido.
+  /// Sin centavos, para estimaciones y cifras grandes: "$221".
+  ///
+  /// En una tarifa estimada los centavos sugieren una precisión que no existe,
+  /// y al volante una cifra corta se lee de un vistazo.
   static String formatCompact(BuildContext context, num amount) {
     return NumberFormat.currency(
-      locale: Localizations.localeOf(context).toLanguageTag(),
+      locale: _marketLocale,
       symbol: currencySymbol,
       decimalDigits: 0,
     ).format(amount);
