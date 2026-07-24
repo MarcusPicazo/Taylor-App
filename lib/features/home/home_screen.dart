@@ -7,6 +7,7 @@ import '../../core/theme/taylor_theme.dart';
 import '../../data/models/ride_tier.dart';
 import '../../data/models/trip.dart';
 import '../../data/places_repository.dart';
+import '../../data/recent_destinations.dart';
 import '../../data/session_controller.dart';
 import '../trips/rating_card.dart';
 import 'destination_search_screen.dart';
@@ -54,12 +55,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       MaterialPageRoute(builder: (_) => const DestinationSearchScreen()),
     );
     if (result == null || !mounted) return;
-    setState(() => _destination = result);
+    _selectDestination(result);
+  }
+
+  void _selectDestination(PlaceSuggestion place) {
+    // Se registra al elegirlo, no al terminar el viaje: aunque cancele, ya
+    // demostró interés en ese lugar y es probable que vuelva a buscarlo.
+    ref.read(recentDestinationsProvider.notifier).remember(place);
+    setState(() => _destination = place);
   }
 
   void _pickSavedPlace(bool isHome) {
-    setState(() {
-      _destination = isHome
+    _selectDestination(
+      isHome
           ? const PlaceSuggestion(
               name: 'Casa',
               address: 'Av. Amsterdam 240, Condesa',
@@ -71,16 +79,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               address: 'Torre Reforma, Paseo de la Reforma 483',
               position: LatLng(19.4260, -99.1677),
               isSaved: true,
-            );
-    });
+            ),
+    );
   }
 
   Future<void> _recenter() async {
+    // Se mueve YA con la última posición conocida, y solo después se pide una
+    // lectura fresca. Antes se esperaba al GPS antes de mover la cámara, y
+    // bajo techo eso tardaba segundos: el botón parecía roto.
     final controller = ref.read(locationControllerProvider.notifier);
+    final known = ref.read(locationControllerProvider).position;
+
+    if (known != null) {
+      await _mapKey.currentState?.moveTo(known);
+    }
+
     await controller.refreshPosition();
-    final position = ref.read(locationControllerProvider).position;
-    if (position != null) {
-      await _mapKey.currentState?.moveTo(position);
+
+    // Si la lectura nueva difiere de la que ya usamos, se ajusta. Suele ser
+    // un movimiento de pocos metros, casi imperceptible.
+    final fresh = ref.read(locationControllerProvider).position;
+    if (fresh != null && fresh != known) {
+      await _mapKey.currentState?.moveTo(fresh);
     }
   }
 
@@ -150,11 +170,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
 
-        // Recentrar. Va justo encima del panel inferior para que quede al
-        // alcance del pulgar sin taparlo.
-        Positioned(
+        // Recentrar. Se eleva según lo alto que esté el panel de abajo, para
+        // no quedar nunca escondido detrás. Antes tenía una posición fija
+        // calculada para el panel plegado, así que el de tarifas —mucho más
+        // alto— lo tapaba por completo.
+        AnimatedPositioned(
+          duration: TaylorMotion.normal,
+          curve: TaylorMotion.emphasized,
           right: TaylorSpacing.md,
-          bottom: TaylorSpacing.navBarClearance + 96,
+          bottom: TaylorSpacing.navBarClearance + _panelHeight(trip),
           child: SafeArea(
             child: RecenterButton(
               onPressed: _recenter,
@@ -186,6 +210,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         ),
       ],
     );
+  }
+
+  /// Alto aproximado del panel inferior según el momento del flujo.
+  ///
+  /// Se estima en lugar de medirse porque medir obligaría a un frame extra:
+  /// el botón se colocaría primero mal y saltaría después. Estas cifras están
+  /// tomadas de los paneles reales y solo necesitan ser aproximadas —el botón
+  /// tiene que quedar por encima, no pegado.
+  double _panelHeight(Trip? trip) {
+    if (trip?.status == TripStatus.completed) return 300;
+    if (trip?.status == TripStatus.searching) return 260;
+    if (trip != null && trip.isActive) return 300;
+    if (_destination != null) return 380;
+    return 96;
   }
 
   Widget _panel(Trip? trip, String firstName) {
@@ -226,8 +264,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return HomeSheet(
       key: const ValueKey('idle'),
       userName: firstName,
+      recents: ref.watch(recentDestinationsProvider),
       onDestinationTap: _openSearch,
       onSavedPlaceTap: _pickSavedPlace,
+      onRecentTap: _selectDestination,
     );
   }
 }

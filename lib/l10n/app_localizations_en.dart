@@ -1069,6 +1069,37 @@ class L10nEn extends L10n {
   String get locationOpenSettings => 'Open settings';
 
   @override
+  String get homeRecent => 'Recent';
+
+  @override
+  String get cardNumber => 'Card number';
+
+  @override
+  String get cardExpiry => 'Expires';
+
+  @override
+  String get cardCvv => 'CVV';
+
+  @override
+  String get cardHolder => 'Name on card';
+
+  @override
+  String get cardSave => 'Save card';
+
+  @override
+  String get cardInvalidNumber => 'That number isn\'t valid';
+
+  @override
+  String get cardInvalidExpiry => 'Invalid expiry date';
+
+  @override
+  String get cardExpired => 'Card expired';
+
+  @override
+  String get cardSecurityNote =>
+      'We only store the brand and last 4 digits. We never store the full number.';
+
+  @override
   String get stepContacts => 'Your trusted circle';
 
   @override

@@ -7,6 +7,7 @@ import '../data/models/taylor_user.dart';
 import '../data/models/trip.dart';
 import '../data/session_controller.dart';
 import '../features/account/account_screen.dart';
+import '../features/account/add_card_screen.dart';
 import '../features/account/help_screen.dart';
 import '../features/account/profile_screen.dart';
 import '../features/account/settings_screen.dart';
@@ -36,6 +37,7 @@ import 'app_mode.dart';
 import 'business_shell_scaffold.dart';
 import 'driver_shell_scaffold.dart';
 import 'shell_scaffold.dart';
+import 'tab_transition.dart';
 
 abstract final class Routes {
   static const splash = '/';
@@ -73,6 +75,9 @@ abstract final class Routes {
 
   /// Recibo de un viaje. Recibe el [Trip] por `extra`.
   static const receipt = '/receipt';
+
+  /// Alta de tarjeta.
+  static const addCard = '/account/wallet/add';
 
   /// Rutas que solo existen en modo conductora.
   static bool isDriverRoute(String location) => location.startsWith('/drive');
@@ -180,22 +185,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.home,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: HomeScreen()),
+                const TabPage(key: ValueKey('HomeScreen'), child: HomeScreen()),
           ),
           GoRoute(
             path: Routes.trips,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: TripsScreen()),
+                const TabPage(key: ValueKey('TripsScreen'), child: TripsScreen()),
           ),
           GoRoute(
             path: Routes.safety,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SafetyScreen()),
+                const TabPage(key: ValueKey('SafetyScreen'), child: SafetyScreen()),
           ),
           GoRoute(
             path: Routes.account,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: AccountScreen()),
+                const TabPage(key: ValueKey('AccountScreen'), child: AccountScreen()),
           ),
         ],
       ),
@@ -208,22 +213,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.driveHome,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: DriverHomeScreen()),
+                const TabPage(key: ValueKey('DriverHomeScreen'), child: DriverHomeScreen()),
           ),
           GoRoute(
             path: Routes.driveEarnings,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: EarningsScreen()),
+                const TabPage(key: ValueKey('EarningsScreen'), child: EarningsScreen()),
           ),
           GoRoute(
             path: Routes.driveSafety,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: SafetyScreen()),
+                const TabPage(key: ValueKey('SafetyScreen'), child: SafetyScreen()),
           ),
           GoRoute(
             path: Routes.driveAccount,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: DriverAccountScreen()),
+                const TabPage(key: ValueKey('DriverAccountScreen'), child: DriverAccountScreen()),
           ),
         ],
       ),
@@ -237,22 +242,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: Routes.businessHome,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BusinessHomeScreen()),
+                const TabPage(key: ValueKey('BusinessHomeScreen'), child: BusinessHomeScreen()),
           ),
           GoRoute(
             path: Routes.businessSchedule,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BusinessScheduleScreen()),
+                const TabPage(key: ValueKey('BusinessScheduleScreen'), child: BusinessScheduleScreen()),
           ),
           GoRoute(
             path: Routes.businessTeam,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BusinessTeamScreen()),
+                const TabPage(key: ValueKey('BusinessTeamScreen'), child: BusinessTeamScreen()),
           ),
           GoRoute(
             path: Routes.businessAccount,
             pageBuilder: (context, state) =>
-                const NoTransitionPage(child: BusinessAccountScreen()),
+                const TabPage(key: ValueKey('BusinessAccountScreen'), child: BusinessAccountScreen()),
           ),
         ],
       ),
@@ -267,6 +272,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         path: Routes.wallet,
         builder: (context, state) => const WalletScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: Routes.addCard,
+        builder: (context, state) => const AddCardScreen(),
       ),
       GoRoute(
         parentNavigatorKey: _rootNavigatorKey,

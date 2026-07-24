@@ -128,8 +128,16 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 }
 
-/// Dibuja una estela que se acorta por detrás mientras el punto avanza,
-/// como el rastro de un vehículo en un mapa.
+/// Estela de movilidad.
+///
+/// Un punto recorre la pantalla dejando rastro y **rebota** al llegar, como
+/// una gota con inercia. Detrás quedan dos líneas de velocidad que se
+/// desvanecen, el recurso clásico de motion graphics para comunicar
+/// desplazamiento con lo mínimo.
+///
+/// Todo el vocabulario es geométrico —punto, línea, arco— sin dibujar un
+/// coche: a esta escala una silueta reconocible competiría con el wordmark, y
+/// la marca es minimalista antes que literal.
 class _TrailPainter extends CustomPainter {
   _TrailPainter({required this.progress});
 
@@ -140,31 +148,62 @@ class _TrailPainter extends CustomPainter {
     final y = size.height / 2;
     final startX = size.width * 0.12;
     final endX = size.width * 0.88;
-    final headX = startX + (endX - startX) * progress;
 
-    // La cola arranca pegada al punto y se estira conforme avanza, luego se
-    // recoge: da la sensación de aceleración sin animar la velocidad.
-    final tailLength = size.width * 0.30 * (1 - (progress - 0.5).abs() * 2)
-        .clamp(0.0, 1.0);
-    final tailX = (headX - tailLength).clamp(startX, endX);
+    // Rebote al final del recorrido: se pasa un poco y vuelve. Es lo que da
+    // el carácter juguetón — un desplazamiento lineal se lee mecánico.
+    final eased = Curves.easeOutBack.transform(progress.clamp(0.0, 1.0));
+    final headX = startX + (endX - startX) * eased;
+
+    // El punto se aplasta al acelerar y se redondea al frenar, conservando el
+    // área: la deformación es lo que sugiere masa y velocidad.
+    final speed = (1 - (progress - 0.45).abs() * 2.2).clamp(0.0, 1.0);
+    final rx = 7 + speed * 5;
+    final ry = 7 - speed * 2.2;
+
+    // Estela principal: se estira al acelerar y se recoge al frenar.
+    final tailLength = size.width * 0.34 * speed;
+    final tailX = (headX - tailLength).clamp(startX - 20, endX);
 
     if (headX > tailX) {
-      final trail = Paint()
-        ..strokeCap = StrokeCap.round
-        ..strokeWidth = 5
-        ..shader = LinearGradient(
-          colors: [
-            TaylorColors.white.withValues(alpha: 0.0),
-            TaylorColors.white.withValues(alpha: 0.85),
-          ],
-        ).createShader(Rect.fromLTRB(tailX, y - 3, headX, y + 3));
-
-      canvas.drawLine(Offset(tailX, y), Offset(headX, y), trail);
+      canvas.drawLine(
+        Offset(tailX, y),
+        Offset(headX, y),
+        Paint()
+          ..strokeCap = StrokeCap.round
+          ..strokeWidth = ry * 1.6
+          ..shader = LinearGradient(
+            colors: [
+              TaylorColors.white.withValues(alpha: 0),
+              TaylorColors.white.withValues(alpha: 0.85),
+            ],
+          ).createShader(Rect.fromLTRB(tailX, y - 4, headX, y + 4)),
+      );
     }
 
-    canvas.drawCircle(
-      Offset(headX, y),
-      7,
+    // Líneas de velocidad, arriba y abajo, desfasadas y más cortas.
+    for (final (offsetY, scale) in [(-13.0, 0.62), (12.0, 0.48)]) {
+      final lineLength = tailLength * scale;
+      final lineEnd = headX - 14 - (1 - speed) * 20;
+      final lineStart = lineEnd - lineLength;
+
+      if (lineLength > 4 && lineEnd > startX) {
+        canvas.drawLine(
+          Offset(lineStart.clamp(startX - 30, endX), y + offsetY),
+          Offset(lineEnd, y + offsetY),
+          Paint()
+            ..strokeCap = StrokeCap.round
+            ..strokeWidth = 3
+            ..color = TaylorColors.white.withValues(alpha: 0.42 * speed),
+        );
+      }
+    }
+
+    canvas.drawOval(
+      Rect.fromCenter(
+        center: Offset(headX, y),
+        width: rx * 2,
+        height: ry * 2,
+      ),
       Paint()..color = TaylorColors.white,
     );
   }

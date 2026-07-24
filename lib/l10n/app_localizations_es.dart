@@ -1076,6 +1076,37 @@ class L10nEs extends L10n {
   String get locationOpenSettings => 'Abrir ajustes';
 
   @override
+  String get homeRecent => 'Recientes';
+
+  @override
+  String get cardNumber => 'Número de tarjeta';
+
+  @override
+  String get cardExpiry => 'Vence';
+
+  @override
+  String get cardCvv => 'CVV';
+
+  @override
+  String get cardHolder => 'Nombre en la tarjeta';
+
+  @override
+  String get cardSave => 'Guardar tarjeta';
+
+  @override
+  String get cardInvalidNumber => 'Ese número no es válido';
+
+  @override
+  String get cardInvalidExpiry => 'Fecha de vencimiento no válida';
+
+  @override
+  String get cardExpired => 'Tarjeta vencida';
+
+  @override
+  String get cardSecurityNote =>
+      'Solo guardamos la marca y los últimos 4 dígitos. Nunca almacenamos el número completo.';
+
+  @override
   String get stepContacts => 'Tu red de confianza';
 
   @override

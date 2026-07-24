@@ -2011,6 +2011,66 @@ abstract class L10n {
   /// **'Abrir ajustes'**
   String get locationOpenSettings;
 
+  /// No description provided for @homeRecent.
+  ///
+  /// In es, this message translates to:
+  /// **'Recientes'**
+  String get homeRecent;
+
+  /// No description provided for @cardNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Número de tarjeta'**
+  String get cardNumber;
+
+  /// No description provided for @cardExpiry.
+  ///
+  /// In es, this message translates to:
+  /// **'Vence'**
+  String get cardExpiry;
+
+  /// No description provided for @cardCvv.
+  ///
+  /// In es, this message translates to:
+  /// **'CVV'**
+  String get cardCvv;
+
+  /// No description provided for @cardHolder.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre en la tarjeta'**
+  String get cardHolder;
+
+  /// No description provided for @cardSave.
+  ///
+  /// In es, this message translates to:
+  /// **'Guardar tarjeta'**
+  String get cardSave;
+
+  /// No description provided for @cardInvalidNumber.
+  ///
+  /// In es, this message translates to:
+  /// **'Ese número no es válido'**
+  String get cardInvalidNumber;
+
+  /// No description provided for @cardInvalidExpiry.
+  ///
+  /// In es, this message translates to:
+  /// **'Fecha de vencimiento no válida'**
+  String get cardInvalidExpiry;
+
+  /// No description provided for @cardExpired.
+  ///
+  /// In es, this message translates to:
+  /// **'Tarjeta vencida'**
+  String get cardExpired;
+
+  /// No description provided for @cardSecurityNote.
+  ///
+  /// In es, this message translates to:
+  /// **'Solo guardamos la marca y los últimos 4 dígitos. Nunca almacenamos el número completo.'**
+  String get cardSecurityNote;
+
   /// No description provided for @stepContacts.
   ///
   /// In es, this message translates to:

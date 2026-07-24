@@ -1,62 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../app/router.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
+import '../../data/models/payment_card.dart';
+import '../../data/wallet_controller.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Métodos de pago.
 ///
-/// La captura de tarjetas NO se implementa aquí: los datos de tarjeta deben
-/// entrar por el SDK del procesador (Stripe, Conekta, etc.), que los tokeniza
-/// sin que la app llegue a tocarlos. Ver README.md → "Pagos".
-class WalletScreen extends StatefulWidget {
+/// El efectivo va siempre al final y no se puede borrar: es el método que
+/// nunca falla, y en México sigue siendo mayoritario. Una wallet que solo
+/// admite tarjeta excluye a buena parte del mercado.
+class WalletScreen extends ConsumerWidget {
   const WalletScreen({super.key});
 
   @override
-  State<WalletScreen> createState() => _WalletScreenState();
-}
-
-class _PaymentMethod {
-  const _PaymentMethod({
-    required this.id,
-    required this.label,
-    required this.icon,
-    this.detail,
-  });
-
-  final String id;
-  final String label;
-  final IconData icon;
-  final String? detail;
-}
-
-class _WalletScreenState extends State<WalletScreen> {
-  static const List<_PaymentMethod> _methods = [
-    _PaymentMethod(
-      id: 'visa',
-      label: 'Visa •••• 4821',
-      icon: Icons.credit_card_rounded,
-      detail: '09/29',
-    ),
-    _PaymentMethod(
-      id: 'mc',
-      label: 'Mastercard •••• 1190',
-      icon: Icons.credit_card_rounded,
-      detail: '02/28',
-    ),
-    _PaymentMethod(
-      id: 'cash',
-      label: 'cash',
-      icon: Icons.payments_outlined,
-    ),
-  ];
-
-  String _defaultId = 'visa';
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
+    final cards = ref.watch(walletControllerProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.walletTitle)),
@@ -67,26 +32,50 @@ class _WalletScreenState extends State<WalletScreen> {
             Text(l10n.walletMethods, style: theme.textTheme.titleMedium),
             const SizedBox(height: TaylorSpacing.sm),
 
-            for (final method in _methods)
+            for (final card in cards)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
-                child: _MethodTile(
-                  icon: method.icon,
-                  // "cash" es un identificador, no una etiqueta: se traduce.
-                  label: method.id == 'cash'
-                      ? l10n.walletCash
-                      : method.label,
-                  detail: method.detail,
-                  isDefault: method.id == _defaultId,
-                  defaultLabel: l10n.walletDefault,
-                  setDefaultLabel: l10n.walletSetDefault,
-                  onSetDefault: () => setState(() => _defaultId = method.id),
+                child: _CardTile(
+                  card: card,
+                  onSetDefault: () => ref
+                      .read(walletControllerProvider.notifier)
+                      .setDefault(card.id),
+                  onRemove: () => _confirmRemove(context, ref, card),
                 ),
               ),
 
+            // Efectivo: siempre disponible, sin acciones.
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Container(
+                padding: const EdgeInsets.all(TaylorSpacing.sm),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surfaceContainerHighest,
+                  borderRadius: BorderRadius.circular(TaylorRadius.lg),
+                  border: Border.all(color: theme.colorScheme.outline),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.payments_outlined,
+                      size: 24,
+                      color: TaylorColors.raspberry,
+                    ),
+                    const SizedBox(width: TaylorSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        l10n.walletCash,
+                        style: theme.textTheme.titleMedium,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
             const SizedBox(height: TaylorSpacing.md),
             OutlinedButton.icon(
-              onPressed: () {},
+              onPressed: () => context.push(Routes.addCard),
               icon: const Icon(Icons.add_rounded),
               label: Text(l10n.walletAddCard),
             ),
@@ -95,30 +84,61 @@ class _WalletScreenState extends State<WalletScreen> {
       ),
     );
   }
+
+  /// Borrar un método de pago se confirma.
+  ///
+  /// No es destructivo de datos, pero quedarse sin método antes de un viaje sí
+  /// es un problema real, y el gesto es fácil de hacer sin querer.
+  Future<void> _confirmRemove(
+    BuildContext context,
+    WidgetRef ref,
+    PaymentCard card,
+  ) async {
+    final l10n = L10n.of(context);
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.walletRemove),
+        content: Text(card.displayNumber),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: FilledButton.styleFrom(
+              backgroundColor: TaylorColors.emergency,
+            ),
+            child: Text(l10n.walletRemove),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      ref.read(walletControllerProvider.notifier).remove(card.id);
+    }
+  }
 }
 
-class _MethodTile extends StatelessWidget {
-  const _MethodTile({
-    required this.icon,
-    required this.label,
-    required this.isDefault,
-    required this.defaultLabel,
-    required this.setDefaultLabel,
+class _CardTile extends StatelessWidget {
+  const _CardTile({
+    required this.card,
     required this.onSetDefault,
-    this.detail,
+    required this.onRemove,
   });
 
-  final IconData icon;
-  final String label;
-  final String? detail;
-  final bool isDefault;
-  final String defaultLabel;
-  final String setDefaultLabel;
+  final PaymentCard card;
   final VoidCallback onSetDefault;
+  final VoidCallback onRemove;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = L10n.of(context);
     final theme = Theme.of(context);
+    final expired = card.isExpired;
 
     return AnimatedContainer(
       duration: TaylorMotion.fast,
@@ -127,44 +147,69 @@ class _MethodTile extends StatelessWidget {
         color: theme.colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(TaylorRadius.lg),
         border: Border.all(
-          color:
-              isDefault ? TaylorColors.raspberry : theme.colorScheme.outline,
-          width: isDefault ? 1.6 : 1,
+          color: card.isDefault
+              ? TaylorColors.raspberry
+              : theme.colorScheme.outline,
+          width: card.isDefault ? 1.6 : 1,
         ),
       ),
       child: Row(
         children: [
-          Icon(icon, size: 24, color: TaylorColors.raspberry),
+          Icon(
+            Icons.credit_card_rounded,
+            size: 24,
+            color: expired ? TaylorColors.inkFaint : TaylorColors.raspberry,
+          ),
           const SizedBox(width: TaylorSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(label, style: theme.textTheme.titleMedium),
-                if (detail != null)
-                  Text(detail!, style: theme.textTheme.labelSmall),
+                Text(
+                  card.displayNumber,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: expired ? TaylorColors.inkMuted : null,
+                  ),
+                ),
+                Text(
+                  expired
+                      ? l10n.cardExpired
+                      : '${l10n.cardExpiry} ${card.displayExpiry}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: expired ? TaylorColors.emergency : null,
+                  ),
+                ),
               ],
             ),
           ),
-          if (isDefault)
+
+          if (card.isDefault)
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: TaylorColors.raspberry.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(TaylorRadius.pill),
               ),
               child: Text(
-                defaultLabel,
+                l10n.walletDefault,
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: TaylorColors.brandText,
                 ),
               ),
             )
-          else
+          else if (!expired)
             TextButton(
               onPressed: onSetDefault,
-              child: Text(setDefaultLabel),
+              child: Text(l10n.walletSetDefault),
             ),
+
+          IconButton(
+            icon: const Icon(Icons.delete_outline_rounded),
+            color: TaylorColors.inkMuted,
+            tooltip: l10n.walletRemove,
+            onPressed: onRemove,
+          ),
         ],
       ),
     );

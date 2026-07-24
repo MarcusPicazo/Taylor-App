@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -46,6 +48,8 @@ class LocationState {
 class LocationController extends StateNotifier<LocationState> {
   LocationController() : super(const LocationState());
 
+  StreamSubscription<Position>? _stream;
+
   /// Posición por defecto mientras no hay permiso: centro de Ciudad de México.
   static const LatLng fallback = LatLng(19.4326, -99.1332);
 
@@ -79,9 +83,37 @@ class LocationController extends StateNotifier<LocationState> {
       }
 
       await refreshPosition();
+      _startStream();
     } catch (_) {
       state = const LocationState(status: LocationStatus.denied);
     }
+  }
+
+  /// Sigue la posición mientras la app está abierta.
+  ///
+  /// Sin esto el punto se quedaba clavado donde estaba al abrir: la usuaria ve
+  /// su posición de hace diez minutos mientras camina hacia el punto de
+  /// encuentro. `distanceFilter` evita reconstruir por cada micro-oscilación
+  /// del GPS —que en ciudad son constantes— y ahorra batería.
+  void _startStream() {
+    _stream?.cancel();
+
+    _stream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 8,
+      ),
+    ).listen(
+      (position) {
+        state = LocationState(
+          status: LocationStatus.granted,
+          position: LatLng(position.latitude, position.longitude),
+        );
+      },
+      // Un error del stream no debe dejar la app sin ubicación: se conserva
+      // la última conocida, que sigue siendo mejor que el centro de la ciudad.
+      onError: (_) {},
+    );
   }
 
   /// Vuelve a leer la posición. Se usa al pulsar "recentrar".
@@ -110,6 +142,12 @@ class LocationController extends StateNotifier<LocationState> {
 
   /// Abre los ajustes del sistema, para el caso de denegación permanente.
   Future<void> openSystemSettings() => Geolocator.openAppSettings();
+
+  @override
+  void dispose() {
+    _stream?.cancel();
+    super.dispose();
+  }
 }
 
 final locationControllerProvider =

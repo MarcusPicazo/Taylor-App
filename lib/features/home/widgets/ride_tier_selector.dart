@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../../../core/format/money.dart';
 import '../../../core/theme/taylor_colors.dart';
+import '../../../core/widgets/car_icon.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../data/models/ride_tier.dart';
 import '../../../l10n/app_localizations.dart';
@@ -98,17 +99,18 @@ class _TierRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // El icono crece un poco al seleccionarse: refuerza la elección
+            // El coche crece un poco al seleccionarse: refuerza la elección
             // sin necesidad de una marca de verificación extra.
             AnimatedScale(
               duration: TaylorMotion.fast,
-              scale: isSelected ? 1.12 : 1,
-              child: Icon(
-                tier.icon,
-                size: 30,
+              curve: Curves.easeOutBack,
+              scale: isSelected ? 1.1 : 0.94,
+              child: CarIcon(
+                tier: tier,
+                size: 46,
                 color: isSelected
                     ? TaylorColors.raspberry
-                    : TaylorColors.inkMuted,
+                    : TaylorColors.inkFaint,
               ),
             ),
             const SizedBox(width: TaylorSpacing.sm),
