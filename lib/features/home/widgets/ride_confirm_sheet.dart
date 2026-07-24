@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
@@ -18,12 +19,21 @@ import 'ride_tier_selector.dart';
 class RideConfirmSheet extends StatelessWidget {
   const RideConfirmSheet({
     super.key,
+    required this.origin,
     required this.destination,
     required this.selectedTier,
     required this.onTierSelected,
     required this.onConfirm,
     required this.onClear,
   });
+
+  /// Punto de partida real de la usuaria.
+  ///
+  /// Se recibe en lugar de asumirse: antes se calculaba la distancia desde una
+  /// dirección fija, así que el precio no correspondía a la ruta dibujada en
+  /// el mapa. Una tarifa que no cuadra con lo que se ve es peor que no
+  /// mostrarla.
+  final LatLng origin;
 
   final PlaceSuggestion destination;
   final RideTier selectedTier;
@@ -33,20 +43,19 @@ class RideConfirmSheet extends StatelessWidget {
 
   /// Distancia aproximada origen–destino, en kilómetros.
   ///
-  /// Se calcula sobre la recta con un factor de 1.35 para aproximar el
-  /// rodeo real de las calles. La distancia exacta viene de la Directions API
-  /// cuando se integre; mientras tanto esto da estimaciones plausibles en vez
-  /// de cifras inventadas.
+  /// Recta entre los dos puntos con un factor de 1.35 que aproxima el rodeo
+  /// de las calles. La distancia exacta viene de la Directions API cuando se
+  /// integre; mientras tanto esto da estimaciones plausibles en lugar de
+  /// cifras inventadas.
   double get _distanceKm {
-    const home = 19.4110;
-    const homeLng = -99.1710;
-
-    // Grados a km en la latitud de Ciudad de México.
+    // Grados a kilómetros en la latitud de Ciudad de México.
     const kmPerLat = 111.0;
     const kmPerLng = 105.0;
 
-    final dLat = (destination.position.latitude - home) * kmPerLat;
-    final dLng = (destination.position.longitude - homeLng) * kmPerLng;
+    final dLat =
+        (destination.position.latitude - origin.latitude) * kmPerLat;
+    final dLng =
+        (destination.position.longitude - origin.longitude) * kmPerLng;
 
     return math.sqrt(dLat * dLat + dLng * dLng) * 1.35;
   }

@@ -214,6 +214,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     if (destination != null) {
       return RideConfirmSheet(
         key: const ValueKey('confirm'),
+        origin: ref.read(locationControllerProvider.notifier).positionOrFallback,
         destination: destination,
         selectedTier: _tier,
         onTierSelected: (tier) => setState(() => _tier = tier),

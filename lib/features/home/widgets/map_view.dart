@@ -102,8 +102,10 @@ class MapViewState extends State<MapView> {
             math.max(a.longitude, b.longitude),
           ),
         ),
-        // Padding generoso: el panel inferior tapa el tercio de abajo.
-        90,
+        // Margen amplio alrededor de la ruta. El panel de tarifas ocupa casi
+        // la mitad inferior de la pantalla, así que sin esto el marcador de
+        // origen queda escondido detrás y la ruta parece empezar de la nada.
+        140,
       ),
     );
   }
@@ -166,9 +168,12 @@ class MapViewState extends State<MapView> {
       zoomGesturesEnabled: true,
       rotateGesturesEnabled: true,
       tiltGesturesEnabled: false,
-      // Sube el logo de Google por encima del panel: taparlo incumple los
-      // términos de uso del mapa.
-      padding: const EdgeInsets.only(bottom: 120),
+      // Desplaza el área útil del mapa hacia arriba para que el panel no tape
+      // ni el contenido ni el logo de Google —taparlo incumple los términos
+      // de uso—. Con destino elegido el panel crece, así que el margen sube.
+      padding: EdgeInsets.only(
+        bottom: destination != null ? 260 : 120,
+      ),
       onMapCreated: (controller) {
         _controller = controller;
         if (origin != null && destination != null) {
