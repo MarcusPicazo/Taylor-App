@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
+import '../../../core/format/money.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
@@ -39,8 +39,7 @@ class _TripSummaryCardState extends State<TripSummaryCard> {
     final trip = widget.trip;
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    final money = NumberFormat.simpleCurrency(locale: locale);
+    String money(num amount) => Money.format(context, amount);
 
     final gross = trip.fare ?? 0;
     final commission = gross * _commissionRate;
@@ -81,10 +80,10 @@ class _TripSummaryCardState extends State<TripSummaryCard> {
 
             const SizedBox(height: TaylorSpacing.md),
 
-            _Line(label: l10n.driveFare, value: money.format(gross)),
+            _Line(label: l10n.driveFare, value: money(gross)),
             _Line(
               label: l10n.driveCommission,
-              value: '−${money.format(commission)}',
+              value: '−${money(commission)}',
               muted: true,
             ),
             const SizedBox(height: 6),
@@ -92,7 +91,7 @@ class _TripSummaryCardState extends State<TripSummaryCard> {
             const SizedBox(height: 6),
             _Line(
               label: l10n.driveYouEarned,
-              value: money.format(net),
+              value: money(net),
               emphasized: true,
             ),
 

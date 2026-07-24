@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 import '../../app/app_mode.dart';
 import '../../app/router.dart';
+import '../../core/format/money.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/session_controller.dart';
@@ -21,7 +21,6 @@ class BusinessAccountScreen extends ConsumerWidget {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
     final account = ref.watch(businessAccountProvider);
-    final locale = Localizations.localeOf(context).toLanguageTag();
 
     if (account == null) return const SizedBox.shrink();
 
@@ -93,8 +92,7 @@ class BusinessAccountScreen extends ConsumerWidget {
                 children: [
                   _BillingLine(
                     label: l10n.bizMonthSpend,
-                    value: NumberFormat.simpleCurrency(locale: locale)
-                        .format(account.monthToDateSpend),
+                    value: Money.format(context, account.monthToDateSpend),
                   ),
                   const SizedBox(height: 6),
                   _BillingLine(
@@ -106,7 +104,8 @@ class BusinessAccountScreen extends ConsumerWidget {
                     label: l10n.bizAvgPerRide,
                     value: account.monthToDateRides == 0
                         ? '—'
-                        : NumberFormat.simpleCurrency(locale: locale).format(
+                        : Money.format(
+                            context,
                             account.monthToDateSpend /
                                 account.monthToDateRides,
                           ),

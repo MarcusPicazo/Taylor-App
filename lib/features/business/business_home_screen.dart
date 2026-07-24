@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/format/money.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/models/business_account.dart';
@@ -137,8 +138,10 @@ class BusinessHomeScreen extends ConsumerWidget {
                           style: theme.textTheme.labelSmall,
                         ),
                         Text(
-                          NumberFormat.simpleCurrency(locale: locale)
-                              .format(account.monthToDateSpend),
+                          Money.formatCompact(
+                            context,
+                            account.monthToDateSpend,
+                          ),
                           style: theme.textTheme.headlineMedium,
                         ),
                       ],

@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
+import '../../../core/format/money.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
@@ -68,7 +68,6 @@ class _IncomingRequestCardState extends State<IncomingRequestCard> {
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
-    final locale = Localizations.localeOf(context).toLanguageTag();
     final request = widget.request;
 
     return Padding(
@@ -113,8 +112,9 @@ class _IncomingRequestCardState extends State<IncomingRequestCard> {
                         ),
                       ),
                       Text(
-                        NumberFormat.simpleCurrency(locale: locale)
-                            .format(request.estimatedFare),
+                        // Sin centavos: al volante, "$154" se lee de un
+                        // vistazo y "$154.00" obliga a enfocar.
+                        Money.formatCompact(context, request.estimatedFare),
                         style: theme.textTheme.displayMedium?.copyWith(
                           color: TaylorColors.raspberry,
                         ),

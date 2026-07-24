@@ -221,6 +221,23 @@ se enchufa sin tocar ni una llamada existente.
 - `lib/core/notifications/notification_router.dart` — qué hace la app cuando se
   toca. Independiente de quién originó la notificación.
 
+### Verificado en dispositivo
+
+Probado en un **Motorola Moto G9 Power, Android 11**. La notificación de
+solicitud se publica y renderiza con sus dos acciones:
+
+```
+Taylor · ahora
+Viaje de Valentina R. · $154
+Av. Michoacán 87, Condesa
+[ Rechazar ]  [ Aceptar ]
+```
+
+Android 11 es API 30, por debajo de API 33, así que **la ruta de
+`requestPermission()` no se ejercitó**: en esa versión las notificaciones no
+requieren permiso en tiempo de ejecución. Queda sin verificar en dispositivo
+hasta tener un Android 13+.
+
 ### Los canales están separados por motivo, no por modo
 
 En Android la usuaria puede silenciar cada canal por separado. Si todo viviera
@@ -431,6 +448,10 @@ Alcance de las Fases 1 y 2, y lo que queda deliberadamente fuera:
   y **es el bloqueador real para lanzar el modo conductora**.
 
 **No empezado**
+- **Persistencia de sesión.** `SessionController` vive en memoria: si Android
+  mata el proceso en segundo plano, la usuaria vuelve al login. Observado en
+  dispositivo real. Se resuelve solo al conectar Firebase Auth, que persiste
+  la sesión de serie — por eso no se implementó a mano.
 - Modo "seguir conduciendo" con encadenado de viajes.
 - Viajes programados en la pestaña Viajes (`l10n.tripsUpcoming` existe sin usar).
 - Tests de widget de las pantallas; hoy se cubren los controladores.

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../core/format/money.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../core/widgets/taylor_logo.dart';
@@ -29,7 +30,7 @@ class ReceiptScreen extends StatelessWidget {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
-    final money = NumberFormat.simpleCurrency(locale: locale);
+    String money(num amount) => Money.format(context, amount);
 
     final total = trip.fare ?? 0;
     final base = total * _baseShare;
@@ -44,7 +45,7 @@ class ReceiptScreen extends StatelessWidget {
             icon: const Icon(Icons.ios_share_rounded),
             tooltip: l10n.receiptShare,
             onPressed: () => Share.share(
-              '${l10n.receiptTitle} Taylor · ${money.format(total)}\n'
+              '${l10n.receiptTitle} Taylor · ${money(total)}\n'
               '${trip.origin.address} → ${trip.destination.address}',
             ),
           ),
@@ -66,7 +67,7 @@ class ReceiptScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: TaylorSpacing.sm),
                   Text(
-                    money.format(total),
+                    money(total),
                     style: theme.textTheme.displayLarge,
                   ),
                 ],
@@ -81,16 +82,16 @@ class ReceiptScreen extends StatelessWidget {
             Divider(color: theme.colorScheme.outline),
             const SizedBox(height: TaylorSpacing.sm),
 
-            _Line(label: l10n.receiptBase, value: money.format(base)),
+            _Line(label: l10n.receiptBase, value: money(base)),
             _Line(
               label: l10n.receiptDistance(
                 trip.distanceKm?.toStringAsFixed(1) ?? '—',
               ),
-              value: money.format(distance),
+              value: money(distance),
             ),
             _Line(
               label: l10n.receiptTime(trip.durationMinutes ?? 0),
-              value: money.format(time),
+              value: money(time),
             ),
 
             const SizedBox(height: TaylorSpacing.sm),
@@ -99,7 +100,7 @@ class ReceiptScreen extends StatelessWidget {
 
             _Line(
               label: l10n.receiptTotal,
-              value: money.format(total),
+              value: money(total),
               emphasized: true,
             ),
 

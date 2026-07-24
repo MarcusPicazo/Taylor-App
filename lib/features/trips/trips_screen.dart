@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../app/router.dart';
+import '../../core/format/money.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/demo_data.dart';
@@ -83,8 +84,7 @@ class _TripCard extends StatelessWidget {
                 const Spacer(),
                 if (trip.fare != null)
                   Text(
-                    NumberFormat.simpleCurrency(locale: locale)
-                        .format(trip.fare),
+                    Money.format(context, trip.fare!),
                     style: theme.textTheme.titleMedium,
                   ),
               ],
@@ -118,9 +118,9 @@ class _TripCard extends StatelessWidget {
             Divider(color: theme.colorScheme.outline),
             const SizedBox(height: 4),
 
-            Row(
-              children: [
-                if (trip.driver != null) ...[
+            if (trip.driver != null)
+              Row(
+                children: [
                   const Icon(
                     Icons.verified_rounded,
                     size: 15,
@@ -135,10 +135,18 @@ class _TripCard extends StatelessWidget {
                     ),
                   ),
                 ],
-                const Spacer(),
+              ),
+
+            // Los botones van en su propia fila, no junto al nombre de la
+            // conductora. "Necesito ayuda con este viaje" es una etiqueta larga
+            // y en español crece aún más: en una pantalla de 720 px desbordaba
+            // por 47 px. Wrap deja que caigan a la línea siguiente en lugar de
+            // recortarse.
+            Wrap(
+              spacing: 4,
+              children: [
                 TextButton(
-                  onPressed: () =>
-                      context.push(Routes.receipt, extra: trip),
+                  onPressed: () => context.push(Routes.receipt, extra: trip),
                   child: Text(l10n.receiptViewReceipt),
                 ),
                 TextButton(

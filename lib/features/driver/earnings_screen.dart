@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../core/format/money.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/models/driver_profile.dart';
@@ -22,8 +23,7 @@ class EarningsScreen extends ConsumerWidget {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
     final profile = ref.watch(driverProfileProvider);
-    final locale = Localizations.localeOf(context).toLanguageTag();
-    final money = NumberFormat.simpleCurrency(locale: locale);
+    String money(num amount) => Money.format(context, amount);
 
     final now = DateTime.now();
     final startOfToday = DateTime(now.year, now.month, now.day);
@@ -74,7 +74,7 @@ class EarningsScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    money.format(today),
+                    money(today),
                     style: theme.textTheme.displayLarge?.copyWith(
                       color: TaylorColors.white,
                     ),
@@ -99,7 +99,7 @@ class EarningsScreen extends ConsumerWidget {
                 Expanded(
                   child: _StatTile(
                     label: l10n.driveThisWeek,
-                    value: money.format(week),
+                    value: money(week),
                   ),
                 ),
                 const SizedBox(width: TaylorSpacing.sm),
@@ -132,7 +132,7 @@ class EarningsScreen extends ConsumerWidget {
               )
             else
               for (final entry in profile.earnings)
-                _EarningRow(entry: entry, locale: locale),
+                _EarningRow(entry: entry),
           ],
         ),
       ),
@@ -183,16 +183,15 @@ class _StatTile extends StatelessWidget {
 }
 
 class _EarningRow extends StatelessWidget {
-  const _EarningRow({required this.entry, required this.locale});
+  const _EarningRow({required this.entry});
 
   final EarningEntry entry;
-  final String locale;
 
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
-    final money = NumberFormat.simpleCurrency(locale: locale);
+    String money(num amount) => Money.format(context, amount);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -210,9 +209,9 @@ class _EarningRow extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    DateFormat.MMMEd(locale)
-                        .add_jm()
-                        .format(entry.completedAt),
+                    DateFormat.MMMEd(
+                      Localizations.localeOf(context).toLanguageTag(),
+                    ).add_jm().format(entry.completedAt),
                     style: theme.textTheme.labelLarge,
                   ),
                   Text(
@@ -226,12 +225,12 @@ class _EarningRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  money.format(entry.net),
+                  money(entry.net),
                   style: theme.textTheme.titleMedium,
                 ),
                 if (entry.tip > 0)
                   Text(
-                    l10n.driveIncludesTip(money.format(entry.tip)),
+                    l10n.driveIncludesTip(money(entry.tip)),
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: TaylorColors.verified,
                     ),
