@@ -104,13 +104,14 @@ class _TierRow extends StatelessWidget {
             AnimatedScale(
               duration: TaylorMotion.fast,
               curve: Curves.easeOutBack,
-              scale: isSelected ? 1.1 : 0.94,
+              scale: isSelected ? 1.08 : 0.95,
               child: CarIcon(
                 tier: tier,
-                size: 46,
+                size: 62,
                 color: isSelected
                     ? TaylorColors.raspberry
-                    : TaylorColors.inkFaint,
+                    : TaylorColors.inkMuted,
+                muted: !isSelected,
               ),
             ),
             const SizedBox(width: TaylorSpacing.sm),

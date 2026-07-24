@@ -25,7 +25,15 @@ class RideConfirmSheet extends StatelessWidget {
     required this.onTierSelected,
     required this.onConfirm,
     required this.onClear,
+    required this.onEditPickup,
+    this.pickupLabel,
   });
+
+  /// Nombre del punto de encuentro si se marcó a mano; nulo si es el GPS.
+  final String? pickupLabel;
+
+  /// Abre el mapa para mover el punto de encuentro.
+  final VoidCallback onEditPickup;
 
   /// Punto de partida real de la usuaria.
   ///
@@ -121,6 +129,43 @@ class RideConfirmSheet extends StatelessWidget {
                 _minutes,
               ),
               style: theme.textTheme.labelSmall,
+            ),
+
+            // Punto de encuentro editable. Va discreto porque la posición GPS
+            // acierta casi siempre; solo hace falta cuando el mapa no coincide
+            // con dónde está realmente la usuaria — un estacionamiento, una
+            // plaza grande, un edificio con varias entradas.
+            const SizedBox(height: 6),
+            InkWell(
+              onTap: onEditPickup,
+              borderRadius: BorderRadius.circular(TaylorRadius.sm),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.trip_origin_rounded,
+                      size: 15,
+                      color: TaylorColors.inkMuted,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        pickupLabel ?? l10n.pinCurrentLocation,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall,
+                      ),
+                    ),
+                    Text(
+                      l10n.pinChange,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: TaylorColors.brandText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             const SizedBox(height: TaylorSpacing.md),

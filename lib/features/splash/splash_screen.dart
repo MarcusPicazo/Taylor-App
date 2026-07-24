@@ -27,6 +27,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   late final AnimationController _controller;
 
   late final Animation<double> _trail;
+  late final Animation<double> _morph;
   late final Animation<double> _dotFade;
   late final Animation<double> _logoFade;
   late final Animation<double> _logoScale;
@@ -40,25 +41,39 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 2100),
     );
 
-    // El trazo se dibuja primero, el punto se desvanece al llegar al final, y
-    // solo entonces entra el logo. Los intervalos se solapan ligeramente para
-    // que la secuencia se lea como un gesto continuo y no como tres pasos.
+    // El punto recorre la pantalla, y al llegar al centro **se derrama** hacia
+    // los lados hasta convertirse en el wordmark.
+    //
+    // Los tramos se solapan a propósito: mientras la gota aún se está
+    // extendiendo, el logo ya empieza a aparecer. Ese solapamiento es lo que
+    // hace que se lea como una transformación en lugar de como "una cosa se
+    // va, otra llega".
     _trail = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.05, 0.55, curve: TaylorMotion.emphasized),
+      curve: const Interval(0.05, 0.52, curve: TaylorMotion.emphasized),
+    );
+
+    // Fase líquida: la gota se estira horizontalmente hasta ocupar el ancho
+    // del logo, y en ese momento se desvanece.
+    _morph = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.48, 0.76, curve: Curves.easeInOutCubic),
     );
     _dotFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.45, 0.62, curve: Curves.easeOut),
+      curve: const Interval(0.62, 0.80, curve: Curves.easeOut),
     );
+
     _logoFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.50, 0.78, curve: Curves.easeOut),
+      curve: const Interval(0.60, 0.84, curve: Curves.easeOut),
     );
-    _logoScale = Tween<double>(begin: 0.88, end: 1.0).animate(
+    // Entra con un rebote mínimo, como si la tensión superficial del líquido
+    // se soltara al cuajar en la forma final.
+    _logoScale = Tween<double>(begin: 0.82, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.50, 0.85, curve: TaylorMotion.emphasized),
+        curve: const Interval(0.60, 0.92, curve: Curves.easeOutBack),
       ),
     );
 
@@ -103,7 +118,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                       opacity: 1 - _dotFade.value,
                       child: CustomPaint(
                         size: const Size(240, 120),
-                        painter: _TrailPainter(progress: _trail.value),
+                        painter: _TrailPainter(
+                          progress: _trail.value,
+                          morph: _morph.value,
+                        ),
                       ),
                     ),
                     Opacity(
@@ -139,15 +157,25 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 /// coche: a esta escala una silueta reconocible competiría con el wordmark, y
 /// la marca es minimalista antes que literal.
 class _TrailPainter extends CustomPainter {
-  _TrailPainter({required this.progress});
+  _TrailPainter({required this.progress, required this.morph});
 
   final double progress;
+
+  /// 0 = gota viajando · 1 = derramada en la forma del wordmark.
+  final double morph;
 
   @override
   void paint(Canvas canvas, Size size) {
     final y = size.height / 2;
     final startX = size.width * 0.12;
     final endX = size.width * 0.88;
+
+    // Fase de derrame: la gota deja de viajar, se recoge al centro y se
+    // extiende a lo ancho hasta convertirse en la base del wordmark.
+    if (morph > 0) {
+      _paintMorph(canvas, size, y);
+      return;
+    }
 
     // Rebote al final del recorrido: se pasa un poco y vuelve. Es lo que da
     // el carácter juguetón — un desplazamiento lineal se lee mecánico.
@@ -208,7 +236,54 @@ class _TrailPainter extends CustomPainter {
     );
   }
 
+  /// La gota se derrama hasta tomar la forma del wordmark.
+  ///
+  /// Se estira a lo ancho mientras se adelgaza —conservando aproximadamente el
+  /// área, como haría un fluido— y las esquinas pasan de círculo a cápsula. Al
+  /// final queda una barra del ancho exacto del logo, sobre la que este entra.
+  ///
+  /// Es un morph de forma, no un fundido cruzado: el objeto nunca desaparece,
+  /// solo cambia de silueta. Esa continuidad es lo que lo hace leer como
+  /// líquido.
+  void _paintMorph(Canvas canvas, Size size, double y) {
+    final t = morph.clamp(0.0, 1.0);
+    final centerX = size.width / 2;
+
+    // De 14 px de diámetro a 170 px de ancho: la anchura del wordmark.
+    final width = 14 + (170 - 14) * t;
+    // Se adelgaza al extenderse, pero nunca a cero: por debajo de ~10 px se
+    // rompería la lectura de masa continua.
+    final height = 14 - 4 * t;
+
+    final rect = Rect.fromCenter(
+      center: Offset(centerX, y),
+      width: width,
+      height: height,
+    );
+
+    canvas.drawRRect(
+      RRect.fromRectAndRadius(rect, Radius.circular(height / 2)),
+      Paint()..color = TaylorColors.white,
+    );
+
+    // Dos gotas satélite que se separan del cuerpo principal y se reabsorben:
+    // el detalle que da la sensación de tensión superficial.
+    if (t > 0.15 && t < 0.85) {
+      final spread = (1 - (t - 0.5).abs() * 2).clamp(0.0, 1.0);
+      final satelliteR = 3.2 * spread;
+      final offset = width * 0.5 + 10 * spread;
+
+      for (final dx in [-offset, offset]) {
+        canvas.drawCircle(
+          Offset(centerX + dx, y),
+          satelliteR,
+          Paint()..color = TaylorColors.white.withValues(alpha: spread * 0.85),
+        );
+      }
+    }
+  }
+
   @override
   bool shouldRepaint(_TrailPainter oldDelegate) =>
-      oldDelegate.progress != progress;
+      oldDelegate.progress != progress || oldDelegate.morph != morph;
 }

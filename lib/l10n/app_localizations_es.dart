@@ -1079,6 +1079,52 @@ class L10nEs extends L10n {
   String get homeRecent => 'Recientes';
 
   @override
+  String get searchDropPin => 'Marcar punto en el mapa';
+
+  @override
+  String get searchResolveFailed =>
+      'No pudimos ubicar ese lugar. Intenta con otro.';
+
+  @override
+  String get pinPickupTitle => '¿Dónde te recogemos?';
+
+  @override
+  String get pinDropoffTitle => '¿A dónde vas?';
+
+  @override
+  String get pinPickupLabel => 'Punto marcado';
+
+  @override
+  String get pinDropoffLabel => 'Destino marcado';
+
+  @override
+  String get pinConfirm => 'Confirmar este punto';
+
+  @override
+  String pinCoordinates(String lat, String lng) {
+    return '$lat, $lng';
+  }
+
+  @override
+  String get pinCurrentLocation => 'Tu ubicación actual';
+
+  @override
+  String get pinChange => 'Cambiar';
+
+  @override
+  String get cancelTripTitle => '¿Cancelar el viaje?';
+
+  @override
+  String get cancelTripBody =>
+      'Tu conductora ya fue notificada. Si cancelas, tendrás que pedir otro viaje.';
+
+  @override
+  String get cancelTripKeep => 'No, seguir';
+
+  @override
+  String get cancelTripConfirm => 'Sí, cancelar';
+
+  @override
   String get cardNumber => 'Número de tarjeta';
 
   @override

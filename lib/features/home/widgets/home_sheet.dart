@@ -69,7 +69,7 @@ class _HomeSheetState extends State<HomeSheet>
   }
 
   /// Alto de la zona plegable, que depende de cuántos recientes haya.
-  double get _extraHeight => 128 + widget.recents.length * 52;
+  double get _extraHeight => 72 + widget.recents.length * 52;
 
   void _onDragUpdate(DragUpdateDetails details) {
     // Arrastrar hacia arriba (dy negativo) despliega.
@@ -176,6 +176,19 @@ class _HomeSheetState extends State<HomeSheet>
                   onTap: widget.onDestinationTap,
                   theme: theme,
                 ),
+
+                // Accesos rápidos, también SIEMPRE visibles.
+                //
+                // Antes vivían solo dentro del panel desplegado, lo que
+                // obligaba a abrirlo para llegar a "Casa" — el destino más
+                // frecuente de todos. Esconder lo más usado detrás de un gesto
+                // es exactamente al revés de como debe ser.
+                const SizedBox(height: 10),
+                _QuickRow(
+                  recents: widget.recents,
+                  onSavedPlaceTap: widget.onSavedPlaceTap,
+                  onRecentTap: widget.onRecentTap,
+                ),
               ],
             ),
           ),
@@ -215,6 +228,114 @@ class _Handle extends StatelessWidget {
   }
 }
 
+/// Fila horizontal de accesos rápidos, siempre visible.
+///
+/// Casa y Oficina primero por ser los destinos más frecuentes; después los
+/// recientes. Se desplaza en horizontal para que quepan sin robarle altura al
+/// mapa: en el estado plegado, cada píxel de panel es un píxel menos de ciudad.
+class _QuickRow extends StatelessWidget {
+  const _QuickRow({
+    required this.recents,
+    required this.onSavedPlaceTap,
+    required this.onRecentTap,
+  });
+
+  final List<PlaceSuggestion> recents;
+  final ValueChanged<bool> onSavedPlaceTap;
+  final ValueChanged<PlaceSuggestion> onRecentTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = L10n.of(context);
+
+    // Los guardados ya aparecen como chips propios: repetirlos desde el
+    // historial sería redundante.
+    final extras = recents.where((p) => !p.isSaved).take(3);
+
+    return SizedBox(
+      height: 38,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        children: [
+          _QuickChip(
+            icon: Icons.home_rounded,
+            label: l10n.homeSavedHome,
+            onTap: () => onSavedPlaceTap(true),
+          ),
+          const SizedBox(width: 8),
+          _QuickChip(
+            icon: Icons.work_outline_rounded,
+            label: l10n.homeSavedWork,
+            onTap: () => onSavedPlaceTap(false),
+          ),
+          for (final place in extras) ...[
+            const SizedBox(width: 8),
+            _QuickChip(
+              icon: Icons.history_rounded,
+              label: place.name,
+              onTap: () => onRecentTap(place),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _QuickChip extends StatelessWidget {
+  const _QuickChip({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: TaylorColors.raspberry.withValues(alpha: 0.08),
+      borderRadius: BorderRadius.circular(TaylorRadius.pill),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(TaylorRadius.pill),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(TaylorRadius.pill),
+            border: Border.all(
+              color: TaylorColors.raspberry.withValues(alpha: 0.28),
+            ),
+          ),
+          child: Row(
+            children: [
+              Icon(icon, size: 16, color: TaylorColors.brandText),
+              const SizedBox(width: 7),
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 130),
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.labelLarge?.copyWith(
+                    color: TaylorColors.brandText,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _ExpandedContent extends StatelessWidget {
   const _ExpandedContent({
     required this.userName,
@@ -233,6 +354,8 @@ class _ExpandedContent extends StatelessWidget {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
 
+    // El desplegado NO repite los chips de acceso rápido: aporta el historial
+    // completo con direcciones legibles, que es lo que no cabe en un chip.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -243,32 +366,10 @@ class _ExpandedContent extends StatelessWidget {
           ),
         Text(l10n.homeWhereTo, style: theme.textTheme.headlineMedium),
 
-        const SizedBox(height: TaylorSpacing.sm),
-
-        Row(
-          children: [
-            Expanded(
-              child: _SavedPlace(
-                icon: Icons.home_rounded,
-                label: l10n.homeSavedHome,
-                onTap: () => onSavedPlaceTap(true),
-              ),
-            ),
-            const SizedBox(width: TaylorSpacing.sm),
-            Expanded(
-              child: _SavedPlace(
-                icon: Icons.work_outline_rounded,
-                label: l10n.homeSavedWork,
-                onTap: () => onSavedPlaceTap(false),
-              ),
-            ),
-          ],
-        ),
-
         if (recents.isNotEmpty) ...[
-          const SizedBox(height: TaylorSpacing.md),
+          const SizedBox(height: TaylorSpacing.sm),
           Text(l10n.homeRecent, style: theme.textTheme.labelSmall),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           for (final place in recents)
             _RecentRow(place: place, onTap: () => onRecentTap(place)),
         ],
@@ -368,48 +469,3 @@ class _DestinationField extends StatelessWidget {
   }
 }
 
-class _SavedPlace extends StatelessWidget {
-  const _SavedPlace({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(TaylorRadius.md),
-      child: Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: TaylorSpacing.sm,
-          vertical: 14,
-        ),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(TaylorRadius.md),
-          border: Border.all(color: theme.colorScheme.outline),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 20, color: TaylorColors.raspberry),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.labelLarge,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

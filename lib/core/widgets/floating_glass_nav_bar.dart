@@ -115,7 +115,10 @@ class _FloatingGlassNavBarState extends State<FloatingGlassNavBar>
         TaylorSpacing.md,
         0,
         TaylorSpacing.md,
-        bottomInset > 0 ? bottomInset * 0.5 : TaylorSpacing.md,
+        // Se separa del borde bastante más que antes. Pegada abajo, la barra
+        // caía sobre la zona del gesto de navegación del sistema y los toques
+        // se disputaban entre ambos.
+        bottomInset > 0 ? bottomInset * 0.5 + 8 : TaylorSpacing.lg,
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(TaylorRadius.xl),

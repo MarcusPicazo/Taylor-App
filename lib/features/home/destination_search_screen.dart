@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../core/config/api_keys.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
 import '../../data/places_repository.dart';
@@ -25,11 +27,15 @@ class _DestinationSearchScreenState
     extends ConsumerState<DestinationSearchScreen> {
   final _controller = TextEditingController();
   final _focus = FocusNode();
-  final _repository = const PlacesRepository();
+
+  /// Se conserva entre pulsaciones porque guarda el token de sesión: crear uno
+  /// nuevo por búsqueda multiplicaría el costo de Places.
+  final _repository = PlacesRepository(apiKey: ApiKeys.maps);
 
   Timer? _debounce;
   List<PlaceSuggestion> _results = const [];
   bool _searching = false;
+  bool _resolving = false;
 
   @override
   void initState() {
@@ -76,6 +82,33 @@ class _DestinationSearchScreenState
     });
   }
 
+  /// Elige una sugerencia y devuelve el lugar ya con coordenadas.
+  ///
+  /// Un resultado de Places llega sin posición: hay que pedirla aparte. Se
+  /// hace aquí, al elegir, y no para las ocho sugerencias, porque pedir
+  /// coordenadas de resultados que nadie va a usar multiplicaría el costo.
+  Future<void> _choose(PlaceSuggestion suggestion) async {
+    if (!suggestion.needsResolution) {
+      Navigator.of(context).pop(suggestion);
+      return;
+    }
+
+    setState(() => _resolving = true);
+    final resolved = await _repository.resolve(suggestion);
+    if (!mounted) return;
+
+    setState(() => _resolving = false);
+
+    if (resolved == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(L10n.of(context).searchResolveFailed)),
+      );
+      return;
+    }
+
+    Navigator.of(context).pop(resolved);
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = L10n.of(context);
@@ -118,7 +151,24 @@ class _DestinationSearchScreenState
               ),
             ),
 
-            if (_searching) const _SearchingBar(),
+            if (_searching || _resolving) const _SearchingBar(),
+
+            // Marcar el punto en el mapa: para direcciones sin nombre, una
+            // entrada de callejón o un punto de encuentro acordado, escribir
+            // no sirve. El pin es la salida.
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                TaylorSpacing.md,
+                4,
+                TaylorSpacing.md,
+                8,
+              ),
+              child: OutlinedButton.icon(
+                onPressed: () => Navigator.of(context).pop(_pinRequest),
+                icon: const Icon(Icons.push_pin_outlined, size: 19),
+                label: Text(l10n.searchDropPin),
+              ),
+            ),
 
             Expanded(
               child: _results.isEmpty
@@ -141,7 +191,7 @@ class _DestinationSearchScreenState
                       itemBuilder: (context, i) => _SuggestionTile(
                         suggestion: _results[i],
                         query: _controller.text.trim(),
-                        onTap: () => Navigator.of(context).pop(_results[i]),
+                        onTap: () => _choose(_results[i]),
                       ),
                     ),
             ),
@@ -151,6 +201,21 @@ class _DestinationSearchScreenState
     );
   }
 }
+
+/// Sentinela que pide abrir el modo de marcar punto en el mapa.
+///
+/// Se devuelve por el mismo canal que una sugerencia real para que quien abre
+/// el buscador no tenga que distinguir dos tipos de resultado; la pantalla de
+/// Inicio lo reconoce por su `placeId`.
+const PlaceSuggestion _pinRequest = PlaceSuggestion(
+  name: '',
+  address: '',
+  position: LatLng(0, 0),
+  placeId: kDropPinRequest,
+);
+
+/// Identificador reservado para la petición de marcar en el mapa.
+const String kDropPinRequest = '__drop_pin__';
 
 /// Barra de progreso finísima mientras se consulta.
 ///

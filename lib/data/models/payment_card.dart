@@ -75,7 +75,7 @@ class PaymentCard {
   String get displayNumber => '${brand.label} •••• $last4';
 
   String get displayExpiry =>
-      '${expiryMonth.toString().padLeft(2, '0')}/${expiryYear % 100}';
+      '${expiryMonth.toString().padLeft(2, '0')}/$expiryYear';
 
   /// Una tarjeta caducada no debería poder cobrarse.
   bool get isExpired {

@@ -22,8 +22,17 @@ abstract final class TaylorSpacing {
   static const double xl = 40;
 
   /// Alto que ocupa la barra flotante inferior, incluido su margen.
-  /// Las pantallas lo usan como padding inferior para no quedar tapadas.
-  static const double navBarClearance = 108;
+  ///
+  /// Las pantallas lo usan como padding inferior para no quedar tapadas, y los
+  /// paneles flotantes de Inicio se apoyan en él.
+  ///
+  /// Se subió de 108 a 132: pegada al borde, la barra quedaba en la zona donde
+  /// el gesto de navegación del sistema compite con los toques, y el panel de
+  /// destino se iba demasiado abajo.
+  static const double navBarClearance = 132;
+
+  /// Separación entre la barra inferior y el panel que flota sobre ella.
+  static const double panelGap = 10;
 }
 
 abstract final class TaylorMotion {

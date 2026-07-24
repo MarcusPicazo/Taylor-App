@@ -2017,6 +2017,90 @@ abstract class L10n {
   /// **'Recientes'**
   String get homeRecent;
 
+  /// No description provided for @searchDropPin.
+  ///
+  /// In es, this message translates to:
+  /// **'Marcar punto en el mapa'**
+  String get searchDropPin;
+
+  /// No description provided for @searchResolveFailed.
+  ///
+  /// In es, this message translates to:
+  /// **'No pudimos ubicar ese lugar. Intenta con otro.'**
+  String get searchResolveFailed;
+
+  /// No description provided for @pinPickupTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Dónde te recogemos?'**
+  String get pinPickupTitle;
+
+  /// No description provided for @pinDropoffTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿A dónde vas?'**
+  String get pinDropoffTitle;
+
+  /// No description provided for @pinPickupLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Punto marcado'**
+  String get pinPickupLabel;
+
+  /// No description provided for @pinDropoffLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Destino marcado'**
+  String get pinDropoffLabel;
+
+  /// No description provided for @pinConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar este punto'**
+  String get pinConfirm;
+
+  /// No description provided for @pinCoordinates.
+  ///
+  /// In es, this message translates to:
+  /// **'{lat}, {lng}'**
+  String pinCoordinates(String lat, String lng);
+
+  /// No description provided for @pinCurrentLocation.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu ubicación actual'**
+  String get pinCurrentLocation;
+
+  /// No description provided for @pinChange.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambiar'**
+  String get pinChange;
+
+  /// No description provided for @cancelTripTitle.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Cancelar el viaje?'**
+  String get cancelTripTitle;
+
+  /// No description provided for @cancelTripBody.
+  ///
+  /// In es, this message translates to:
+  /// **'Tu conductora ya fue notificada. Si cancelas, tendrás que pedir otro viaje.'**
+  String get cancelTripBody;
+
+  /// No description provided for @cancelTripKeep.
+  ///
+  /// In es, this message translates to:
+  /// **'No, seguir'**
+  String get cancelTripKeep;
+
+  /// No description provided for @cancelTripConfirm.
+  ///
+  /// In es, this message translates to:
+  /// **'Sí, cancelar'**
+  String get cancelTripConfirm;
+
   /// No description provided for @cardNumber.
   ///
   /// In es, this message translates to:

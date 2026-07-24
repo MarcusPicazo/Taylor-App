@@ -407,6 +407,26 @@
   "locationDenied": "Without location we can't center you on the map, but you can still type your destination.",
   "locationOpenSettings": "Open settings",
   "homeRecent": "Recent",
+  "searchDropPin": "Drop a pin on the map",
+  "searchResolveFailed": "We couldn't locate that place. Try another one.",
+  "pinPickupTitle": "Where should we pick you up?",
+  "pinDropoffTitle": "Where are you going?",
+  "pinPickupLabel": "Pinned point",
+  "pinDropoffLabel": "Pinned destination",
+  "pinConfirm": "Confirm this point",
+  "pinCoordinates": "{lat}, {lng}",
+  "@pinCoordinates": {
+    "placeholders": {
+      "lat": { "type": "String" },
+      "lng": { "type": "String" }
+    }
+  },
+  "pinCurrentLocation": "Your current location",
+  "pinChange": "Change",
+  "cancelTripTitle": "Cancel the ride?",
+  "cancelTripBody": "Your driver has already been notified. If you cancel, you'll need to request another ride.",
+  "cancelTripKeep": "No, keep it",
+  "cancelTripConfirm": "Yes, cancel",
   "cardNumber": "Card number",
   "cardExpiry": "Expires",
   "cardCvv": "CVV",

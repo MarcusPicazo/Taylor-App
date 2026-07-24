@@ -88,19 +88,22 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
     }
 
     setState(() {
-      _expiryError = digits.length == 4 && !_parseExpiry(digits).isValid
+      _expiryError = digits.length == 6 && !_parseExpiry(digits).isValid
           ? L10n.of(context).cardInvalidExpiry
           : null;
     });
   }
 
+  /// Interpreta la caducidad como MM/AAAA: dos dígitos de mes y cuatro de año.
+  ///
+  /// El año completo evita la ambigüedad del formato de dos dígitos, donde
+  /// "29" podría ser 2029 o 1929 y hay que asumir el siglo. Con cuatro no hay
+  /// nada que asumir.
   ({bool isValid, int month, int year}) _parseExpiry(String digits) {
-    if (digits.length != 4) return (isValid: false, month: 0, year: 0);
+    if (digits.length != 6) return (isValid: false, month: 0, year: 0);
 
     final month = int.tryParse(digits.substring(0, 2)) ?? 0;
-    // Dos dígitos de año: se asume siglo actual, como hacen todas las
-    // pasarelas. "29" es 2029, no 1929.
-    final year = 2000 + (int.tryParse(digits.substring(2)) ?? 0);
+    final year = int.tryParse(digits.substring(2)) ?? 0;
 
     return (
       isValid: CardValidator.isValidExpiry(month, year),
@@ -196,12 +199,13 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
                     keyboardType: TextInputType.number,
                     inputFormatters: [
                       FilteringTextInputFormatter.digitsOnly,
-                      LengthLimitingTextInputFormatter(5),
+                      // 7 = 2 de mes + 4 de año + la barra.
+                      LengthLimitingTextInputFormatter(7),
                     ],
                     onChanged: _onExpiryChanged,
                     decoration: InputDecoration(
                       labelText: l10n.cardExpiry,
-                      hintText: 'MM/AA',
+                      hintText: 'MM/AAAA',
                       errorText: _expiryError,
                     ),
                   ),
@@ -365,7 +369,7 @@ class _CardPreview extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  expiry.isEmpty ? 'MM/AA' : expiry,
+                  expiry.isEmpty ? 'MM/AAAA' : expiry,
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: TaylorColors.white.withValues(alpha: 0.9),
                   ),

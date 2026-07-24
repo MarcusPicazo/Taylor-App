@@ -407,6 +407,26 @@
   "locationDenied": "Sin ubicación no podemos centrarte en el mapa, pero puedes escribir tu destino igual.",
   "locationOpenSettings": "Abrir ajustes",
   "homeRecent": "Recientes",
+  "searchDropPin": "Marcar punto en el mapa",
+  "searchResolveFailed": "No pudimos ubicar ese lugar. Intenta con otro.",
+  "pinPickupTitle": "¿Dónde te recogemos?",
+  "pinDropoffTitle": "¿A dónde vas?",
+  "pinPickupLabel": "Punto marcado",
+  "pinDropoffLabel": "Destino marcado",
+  "pinConfirm": "Confirmar este punto",
+  "pinCoordinates": "{lat}, {lng}",
+  "@pinCoordinates": {
+    "placeholders": {
+      "lat": { "type": "String" },
+      "lng": { "type": "String" }
+    }
+  },
+  "pinCurrentLocation": "Tu ubicación actual",
+  "pinChange": "Cambiar",
+  "cancelTripTitle": "¿Cancelar el viaje?",
+  "cancelTripBody": "Tu conductora ya fue notificada. Si cancelas, tendrás que pedir otro viaje.",
+  "cancelTripKeep": "No, seguir",
+  "cancelTripConfirm": "Sí, cancelar",
   "cardNumber": "Número de tarjeta",
   "cardExpiry": "Vence",
   "cardCvv": "CVV",
