@@ -4,17 +4,23 @@ import 'package:go_router/go_router.dart';
 
 import '../../app/router.dart';
 import '../../core/theme/taylor_colors.dart';
-import '../../core/theme/taylor_theme.dart';
 import '../../core/widgets/taylor_logo.dart';
 import '../../data/models/taylor_user.dart';
 import '../../data/session_controller.dart';
 
 /// Pantalla de apertura.
 ///
-/// Un punto recorre un trazo horizontal —la idea de trayecto— y al llegar se
-/// disuelve en el wordmark. Dura poco más de dos segundos: el brand book pide
-/// que la app se sienta rápida, así que el splash sugiere movilidad y se quita
-/// de en medio en lugar de lucirse.
+/// La animación cuenta una idea en tres tiempos: **línea → gota → logo**.
+///
+/// 1. Una línea cruza la pantalla acelerando y frenando, como un vehículo que
+///    arranca y llega. Ese perfil de velocidad es lo que la hace leer como
+///    movimiento real y no como una barra que se desplaza.
+/// 2. Al detenerse, la cola alcanza a la cabeza y la línea **se recoge en una
+///    gota**: la masa se conserva, solo cambia de forma.
+/// 3. La gota se derrama a lo ancho y el wordmark cuaja sobre ella.
+///
+/// El objeto nunca desaparece ni se sustituye por otro. Esa continuidad es
+/// exactamente lo que separa un motion graphic de una secuencia de fundidos.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -26,9 +32,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
 
-  late final Animation<double> _trail;
-  late final Animation<double> _morph;
-  late final Animation<double> _dotFade;
+  late final Animation<double> _travel;
+  late final Animation<double> _gather;
+  late final Animation<double> _spread;
+  late final Animation<double> _shapeFade;
   late final Animation<double> _logoFade;
   late final Animation<double> _logoScale;
 
@@ -38,42 +45,44 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2100),
+      duration: const Duration(milliseconds: 2400),
     );
 
-    // El punto recorre la pantalla, y al llegar al centro **se derrama** hacia
-    // los lados hasta convertirse en el wordmark.
-    //
-    // Los tramos se solapan a propósito: mientras la gota aún se está
-    // extendiendo, el logo ya empieza a aparecer. Ese solapamiento es lo que
-    // hace que se lea como una transformación en lugar de como "una cosa se
-    // va, otra llega".
-    _trail = CurvedAnimation(
+    // Recorrido con aceleración y frenada. easeInOutCubic es justo eso: sale
+    // despacio, gana velocidad en el centro y se detiene con suavidad.
+    _travel = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.05, 0.52, curve: TaylorMotion.emphasized),
+      curve: const Interval(0.00, 0.46, curve: Curves.easeInOutCubic),
     );
 
-    // Fase líquida: la gota se estira horizontalmente hasta ocupar el ancho
-    // del logo, y en ese momento se desvanece.
-    _morph = CurvedAnimation(
+    // La cola alcanza a la cabeza y la línea se recoge en gota. Con un ligero
+    // rebote: la masa que venía en movimiento no frena en seco.
+    _gather = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.48, 0.76, curve: Curves.easeInOutCubic),
-    );
-    _dotFade = CurvedAnimation(
-      parent: _controller,
-      curve: const Interval(0.62, 0.80, curve: Curves.easeOut),
+      curve: const Interval(0.42, 0.64, curve: Curves.easeOutBack),
     );
 
+    // La gota se derrama hasta el ancho del wordmark.
+    _spread = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.62, 0.84, curve: Curves.easeInOutCubic),
+    );
+
+    _shapeFade = CurvedAnimation(
+      parent: _controller,
+      curve: const Interval(0.76, 0.90, curve: Curves.easeOut),
+    );
+
+    // El logo entra mientras la forma aún está extendiéndose: el solape es lo
+    // que lo hace leer como transformación y no como relevo.
     _logoFade = CurvedAnimation(
       parent: _controller,
-      curve: const Interval(0.60, 0.84, curve: Curves.easeOut),
+      curve: const Interval(0.72, 0.90, curve: Curves.easeOut),
     );
-    // Entra con un rebote mínimo, como si la tensión superficial del líquido
-    // se soltara al cuajar en la forma final.
-    _logoScale = Tween<double>(begin: 0.82, end: 1.0).animate(
+    _logoScale = Tween<double>(begin: 0.86, end: 1).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: const Interval(0.60, 0.92, curve: Curves.easeOutBack),
+        curve: const Interval(0.72, 0.96, curve: Curves.easeOutBack),
       ),
     );
 
@@ -109,18 +118,19 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             animation: _controller,
             builder: (context, _) {
               return SizedBox(
-                width: 240,
+                width: 260,
                 height: 120,
                 child: Stack(
                   alignment: Alignment.center,
                   children: [
                     Opacity(
-                      opacity: 1 - _dotFade.value,
+                      opacity: 1 - _shapeFade.value,
                       child: CustomPaint(
-                        size: const Size(240, 120),
-                        painter: _TrailPainter(
-                          progress: _trail.value,
-                          morph: _morph.value,
+                        size: const Size(260, 120),
+                        painter: _MorphPainter(
+                          travel: _travel.value,
+                          gather: _gather.value,
+                          spread: _spread.value,
                         ),
                       ),
                     ),
@@ -146,144 +156,146 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   }
 }
 
-/// Estela de movilidad.
+/// Dibuja las tres fases sobre una sola forma continua.
 ///
-/// Un punto recorre la pantalla dejando rastro y **rebota** al llegar, como
-/// una gota con inercia. Detrás quedan dos líneas de velocidad que se
-/// desvanecen, el recurso clásico de motion graphics para comunicar
-/// desplazamiento con lo mínimo.
-///
-/// Todo el vocabulario es geométrico —punto, línea, arco— sin dibujar un
-/// coche: a esta escala una silueta reconocible competiría con el wordmark, y
-/// la marca es minimalista antes que literal.
-class _TrailPainter extends CustomPainter {
-  _TrailPainter({required this.progress, required this.morph});
+/// En todo momento se pinta **una cápsula**: un rectángulo de esquinas
+/// completamente redondeadas. Lo único que cambia es su centro, su longitud y
+/// su grosor. Que las tres fases sean la misma primitiva es lo que hace que
+/// la transición no tenga costuras.
+class _MorphPainter extends CustomPainter {
+  _MorphPainter({
+    required this.travel,
+    required this.gather,
+    required this.spread,
+  });
 
-  final double progress;
+  /// 0..1 — recorrido de la línea.
+  final double travel;
 
-  /// 0 = gota viajando · 1 = derramada en la forma del wordmark.
-  final double morph;
+  /// 0..1 — la línea se recoge en gota.
+  final double gather;
+
+  /// 0..1 — la gota se derrama en la forma del wordmark.
+  final double spread;
+
+  /// Grosor de la línea en movimiento.
+  static const double _lineThickness = 9;
+
+  /// Diámetro de la gota ya recogida.
+  static const double _dropSize = 20;
+
+  /// Ancho final, el del wordmark "taylor" a 56 px.
+  static const double _logoWidth = 172;
 
   @override
   void paint(Canvas canvas, Size size) {
     final y = size.height / 2;
-    final startX = size.width * 0.12;
-    final endX = size.width * 0.88;
-
-    // Fase de derrame: la gota deja de viajar, se recoge al centro y se
-    // extiende a lo ancho hasta convertirse en la base del wordmark.
-    if (morph > 0) {
-      _paintMorph(canvas, size, y);
-      return;
-    }
-
-    // Rebote al final del recorrido: se pasa un poco y vuelve. Es lo que da
-    // el carácter juguetón — un desplazamiento lineal se lee mecánico.
-    final eased = Curves.easeOutBack.transform(progress.clamp(0.0, 1.0));
-    final headX = startX + (endX - startX) * eased;
-
-    // El punto se aplasta al acelerar y se redondea al frenar, conservando el
-    // área: la deformación es lo que sugiere masa y velocidad.
-    final speed = (1 - (progress - 0.45).abs() * 2.2).clamp(0.0, 1.0);
-    final rx = 7 + speed * 5;
-    final ry = 7 - speed * 2.2;
-
-    // Estela principal: se estira al acelerar y se recoge al frenar.
-    final tailLength = size.width * 0.34 * speed;
-    final tailX = (headX - tailLength).clamp(startX - 20, endX);
-
-    if (headX > tailX) {
-      canvas.drawLine(
-        Offset(tailX, y),
-        Offset(headX, y),
-        Paint()
-          ..strokeCap = StrokeCap.round
-          ..strokeWidth = ry * 1.6
-          ..shader = LinearGradient(
-            colors: [
-              TaylorColors.white.withValues(alpha: 0),
-              TaylorColors.white.withValues(alpha: 0.85),
-            ],
-          ).createShader(Rect.fromLTRB(tailX, y - 4, headX, y + 4)),
-      );
-    }
-
-    // Líneas de velocidad, arriba y abajo, desfasadas y más cortas.
-    for (final (offsetY, scale) in [(-13.0, 0.62), (12.0, 0.48)]) {
-      final lineLength = tailLength * scale;
-      final lineEnd = headX - 14 - (1 - speed) * 20;
-      final lineStart = lineEnd - lineLength;
-
-      if (lineLength > 4 && lineEnd > startX) {
-        canvas.drawLine(
-          Offset(lineStart.clamp(startX - 30, endX), y + offsetY),
-          Offset(lineEnd, y + offsetY),
-          Paint()
-            ..strokeCap = StrokeCap.round
-            ..strokeWidth = 3
-            ..color = TaylorColors.white.withValues(alpha: 0.42 * speed),
-        );
-      }
-    }
-
-    canvas.drawOval(
-      Rect.fromCenter(
-        center: Offset(headX, y),
-        width: rx * 2,
-        height: ry * 2,
-      ),
-      Paint()..color = TaylorColors.white,
-    );
-  }
-
-  /// La gota se derrama hasta tomar la forma del wordmark.
-  ///
-  /// Se estira a lo ancho mientras se adelgaza —conservando aproximadamente el
-  /// área, como haría un fluido— y las esquinas pasan de círculo a cápsula. Al
-  /// final queda una barra del ancho exacto del logo, sobre la que este entra.
-  ///
-  /// Es un morph de forma, no un fundido cruzado: el objeto nunca desaparece,
-  /// solo cambia de silueta. Esa continuidad es lo que lo hace leer como
-  /// líquido.
-  void _paintMorph(Canvas canvas, Size size, double y) {
-    final t = morph.clamp(0.0, 1.0);
+    final startX = size.width * 0.14;
+    final endX = size.width * 0.86;
     final centerX = size.width / 2;
 
-    // De 14 px de diámetro a 170 px de ancho: la anchura del wordmark.
-    final width = 14 + (170 - 14) * t;
-    // Se adelgaza al extenderse, pero nunca a cero: por debajo de ~10 px se
-    // rompería la lectura de masa continua.
-    final height = 14 - 4 * t;
+    // --- Fase 1: la línea viaja -------------------------------------------
+    // La cabeza avanza con el recorrido; la cola arranca pegada, se descuelga
+    // al acelerar y vuelve a alcanzarla al frenar. Esa distancia variable es
+    // lo que dibuja la aceleración sin necesidad de animar nada más.
+    final headX = startX + (endX - startX) * travel;
 
-    final rect = Rect.fromCenter(
-      center: Offset(centerX, y),
-      width: width,
-      height: height,
+    // Campana: máxima separación a mitad de recorrido, cero en los extremos.
+    //
+    // Se le suma un mínimo para que en el instante cero la forma sea una gota
+    // y no un punto de ancho nulo: sin él, la animación arranca con la
+    // pantalla vacía durante unos fotogramas y parece que se ha colgado.
+    final stretch = _bell(travel);
+    final length = _lineThickness + (endX - startX) * 0.34 * stretch;
+    final tailX = headX - length;
+
+    var thickness = _lineThickness;
+    var left = tailX;
+    var right = headX;
+
+    // --- Fase 2: se recoge en gota ----------------------------------------
+    if (gather > 0) {
+      // La cola alcanza a la cabeza y la forma se contrae sobre su centro.
+      final t = gather.clamp(0.0, 1.0);
+      final lineCenter = (tailX + headX) / 2;
+      final target = centerX;
+
+      final currentCenter = lineCenter + (target - lineCenter) * t;
+      final currentLength = (headX - tailX) * (1 - t) + _dropSize * t;
+
+      // Al recogerse engorda: el volumen que pierde a lo largo lo gana a lo
+      // alto, como haría una masa real.
+      thickness = _lineThickness + (_dropSize - _lineThickness) * t;
+
+      left = currentCenter - currentLength / 2;
+      right = currentCenter + currentLength / 2;
+    }
+
+    // --- Fase 3: se derrama en el logo ------------------------------------
+    if (spread > 0) {
+      final t = spread.clamp(0.0, 1.0);
+      final width = _dropSize + (_logoWidth - _dropSize) * t;
+
+      // Al extenderse adelgaza, otra vez conservando la masa.
+      thickness = _dropSize - (_dropSize - 11) * t;
+
+      left = centerX - width / 2;
+      right = centerX + width / 2;
+    }
+
+    final rect = Rect.fromLTRB(
+      left,
+      y - thickness / 2,
+      right,
+      y + thickness / 2,
     );
 
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, Radius.circular(height / 2)),
+      RRect.fromRectAndRadius(rect, Radius.circular(thickness / 2)),
       Paint()..color = TaylorColors.white,
     );
 
-    // Dos gotas satélite que se separan del cuerpo principal y se reabsorben:
-    // el detalle que da la sensación de tensión superficial.
-    if (t > 0.15 && t < 0.85) {
-      final spread = (1 - (t - 0.5).abs() * 2).clamp(0.0, 1.0);
-      final satelliteR = 3.2 * spread;
-      final offset = width * 0.5 + 10 * spread;
+    // Estela: solo mientras viaja, y solo si hay velocidad. Refuerza la
+    // dirección del movimiento sin ensuciar las fases quietas.
+    if (gather == 0 && stretch > 0.05) {
+      canvas.drawRRect(
+        RRect.fromRectAndRadius(
+          Rect.fromLTRB(
+            tailX - 26 * stretch,
+            y - thickness * 0.28,
+            tailX + 4,
+            y + thickness * 0.28,
+          ),
+          Radius.circular(thickness),
+        ),
+        Paint()..color = TaylorColors.white.withValues(alpha: 0.30 * stretch),
+      );
+    }
 
-      for (final dx in [-offset, offset]) {
+    // Gotas satélite al recogerse: se desprenden y se reabsorben. Es el
+    // detalle que comunica tensión superficial, y lo que hace que la forma se
+    // lea líquida y no elástica.
+    if (gather > 0.1 && gather < 0.95 && spread == 0) {
+      final pop = _bell(gather);
+      for (final dx in [-1.0, 1.0]) {
         canvas.drawCircle(
-          Offset(centerX + dx, y),
-          satelliteR,
-          Paint()..color = TaylorColors.white.withValues(alpha: spread * 0.85),
+          Offset(centerX + dx * (_dropSize * 0.9 + 14 * pop), y),
+          3.4 * pop,
+          Paint()..color = TaylorColors.white.withValues(alpha: 0.8 * pop),
         );
       }
     }
   }
 
+  /// Campana simétrica: 0 en los extremos, 1 en el centro.
+  double _bell(double t) {
+    final clamped = t.clamp(0.0, 1.0);
+    return 1 - (clamped - 0.5).abs() * 2;
+  }
+
   @override
-  bool shouldRepaint(_TrailPainter oldDelegate) =>
-      oldDelegate.progress != progress || oldDelegate.morph != morph;
+  bool shouldRepaint(_MorphPainter oldDelegate) =>
+      oldDelegate.travel != travel ||
+      oldDelegate.gather != gather ||
+      oldDelegate.spread != spread;
 }

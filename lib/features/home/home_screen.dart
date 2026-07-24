@@ -52,6 +52,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   /// recentrar a mano cada vez, aunque el permiso ya estuviera concedido.
   bool _centeredOnUser = false;
 
+  /// Cuánto ha crecido el panel plegable, reportado en cada fotograma.
+  ///
+  /// Es un [ValueNotifier] y no estado del widget a propósito: con `setState`
+  /// se reconstruiría toda la pantalla —incluido el mapa— sesenta veces por
+  /// segundo durante el arrastre. Así solo se repinta el botón.
+  final _sheetExpansion = ValueNotifier<double>(0);
+
   @override
   void initState() {
     super.initState();
@@ -269,11 +276,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         // no quedar nunca escondido detrás. Antes tenía una posición fija
         // calculada para el panel plegado, así que el de tarifas —mucho más
         // alto— lo tapaba por completo.
-        AnimatedPositioned(
-          duration: TaylorMotion.normal,
-          curve: TaylorMotion.emphasized,
-          right: TaylorSpacing.md,
-          bottom: TaylorSpacing.navBarClearance + _panelHeight(trip),
+        ValueListenableBuilder<double>(
+          valueListenable: _sheetExpansion,
+          builder: (context, expansion, child) {
+            // Con viaje activo el panel no se arrastra, así que la expansión
+            // del plegable no aplica.
+            final extra = trip == null && _destination == null ? expansion : 0.0;
+
+            return Positioned(
+              right: TaylorSpacing.md,
+              bottom: TaylorSpacing.navBarClearance +
+                  _panelHeight(trip) +
+                  extra,
+              // Sin AnimatedPositioned: la altura ya llega interpolada en cada
+              // fotograma, desde el dedo o desde la curva de asentamiento del
+              // panel. Animarla otra vez añadiría un retraso elástico que hace
+              // que el botón parezca perseguir al panel en lugar de moverse
+              // con él.
+              child: child!,
+            );
+          },
           child: SafeArea(
             child: RecenterButton(
               onPressed: _recenter,
@@ -285,7 +307,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         Positioned(
           left: 0,
           right: 0,
-          bottom: TaylorSpacing.navBarClearance - 12,
+          // Separación constante entre el panel y la barra, sea cual sea el
+          // estado del flujo: los dos bloques flotan como un grupo.
+          bottom: TaylorSpacing.navBarClearance - TaylorSpacing.xl,
           child: AnimatedSwitcher(
             duration: TaylorMotion.normal,
             switchInCurve: TaylorMotion.emphasized,
@@ -307,18 +331,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  /// Alto aproximado del panel inferior según el momento del flujo.
+  /// Alto del panel inferior según el momento del flujo.
   ///
-  /// Se estima en lugar de medirse porque medir obligaría a un frame extra:
-  /// el botón se colocaría primero mal y saltaría después. Estas cifras están
-  /// tomadas de los paneles reales y solo necesitan ser aproximadas —el botón
+  /// Se estima en lugar de medirse porque medir obligaría a un fotograma
+  /// extra: el botón se colocaría mal primero y saltaría después. Estas cifras
+  /// vienen de los paneles reales y solo necesitan ser aproximadas — el botón
   /// tiene que quedar por encima, no pegado.
+  ///
+  /// Al panel plegable se le suma su expansión real, que llega por callback en
+  /// cada fotograma del arrastre.
   double _panelHeight(Trip? trip) {
     if (trip?.status == TripStatus.completed) return 300;
-    if (trip?.status == TripStatus.searching) return 260;
+    if (trip?.status == TripStatus.searching) return 250;
     if (trip != null && trip.isActive) return 300;
-    if (_destination != null) return 380;
-    return 96;
+    if (_destination != null) return 400;
+
+    // Plegado: campo de destino + chips de acceso rápido. La expansión se
+    // suma aparte, en el ValueListenableBuilder del botón.
+    return 150;
   }
 
   Widget _panel(Trip? trip, String firstName) {
@@ -366,6 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       onDestinationTap: _openSearch,
       onSavedPlaceTap: _pickSavedPlace,
       onRecentTap: _selectDestination,
+      onExpansionChanged: (height) => _sheetExpansion.value = height,
     );
   }
 }

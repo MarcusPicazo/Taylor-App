@@ -28,7 +28,15 @@ class HomeSheet extends StatefulWidget {
     required this.onDestinationTap,
     required this.onSavedPlaceTap,
     required this.onRecentTap,
+    this.onExpansionChanged,
   });
+
+  /// Informa de cuánto crece el panel, en píxeles, mientras se despliega.
+  ///
+  /// Existe para que el botón de recentrar suba y baje **con el dedo**, no al
+  /// terminar la animación: si solo se avisara al final, el botón quedaría
+  /// tapado durante todo el arrastre, que es justo cuando se está mirando.
+  final ValueChanged<double>? onExpansionChanged;
 
   final String userName;
   final List<PlaceSuggestion> recents;
@@ -60,10 +68,21 @@ class _HomeSheetState extends State<HomeSheet>
       vsync: this,
       duration: const Duration(milliseconds: 460),
     );
+
+    // Se notifica en cada fotograma para que quien escuche siga al panel en
+    // tiempo real durante el arrastre y durante el asentamiento.
+    _controller.addListener(_reportHeight);
+  }
+
+  void _reportHeight() {
+    widget.onExpansionChanged?.call(
+      _extraHeight * _controller.value.clamp(0.0, 1.0),
+    );
   }
 
   @override
   void dispose() {
+    _controller.removeListener(_reportHeight);
     _controller.dispose();
     super.dispose();
   }

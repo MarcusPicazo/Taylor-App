@@ -26,10 +26,11 @@ abstract final class TaylorSpacing {
   /// Las pantallas lo usan como padding inferior para no quedar tapadas, y los
   /// paneles flotantes de Inicio se apoyan en él.
   ///
-  /// Se subió de 108 a 132: pegada al borde, la barra quedaba en la zona donde
-  /// el gesto de navegación del sistema compite con los toques, y el panel de
-  /// destino se iba demasiado abajo.
-  static const double navBarClearance = 132;
+  /// Pegada al borde, la barra caía en la franja del gesto de navegación del
+  /// sistema —donde los toques se disputan— y el panel de destino quedaba
+  /// incómodamente bajo para el pulgar. Se separó en dos pasos, de 108 a 132 y
+  /// de ahí a 156, hasta que ambos quedaron en la zona cómoda de alcance.
+  static const double navBarClearance = 156;
 
   /// Separación entre la barra inferior y el panel que flota sobre ella.
   static const double panelGap = 10;
