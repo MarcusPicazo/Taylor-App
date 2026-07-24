@@ -30,6 +30,48 @@ verde sereno de "verificada". La app comunica protección, no alarma.
 
 ---
 
+## Retomar el trabajo
+
+Todo está instalado y configurado. Para volver a probar en un Android:
+
+**1. Conecta el teléfono** con Depuración USB activada y comprueba que se ve:
+
+```bash
+adb devices
+```
+
+Si aparece `unauthorized`, desbloquea el teléfono y acepta el diálogo.
+
+**2. Compila e instala.** La clave de mapas va por `--dart-define` porque el
+buscador la consulta desde Dart; el mapa nativo la lee aparte de
+`android/local.properties`:
+
+```bash
+flutter build apk --debug --dart-define=MAPS_API_KEY=TU_CLAVE
+```
+
+```bash
+adb install -r build/app/outputs/flutter-apk/app-debug.apk
+```
+
+**3. Entra** con `test@taylor.com` / `Taylor123`.
+
+### Pendientes que requieren tu cuenta de Google
+
+- **Habilitar Places API.** Sin ella el buscador cae al catálogo local de
+  veinte lugares y no reconoce direcciones. Google Cloud → Biblioteca de APIs →
+  *Places API* → Habilitar. Misma clave, no hay que tocar código.
+- **Restringir la clave de Maps** a `app.taylor.taylor` + el SHA-1 de
+  depuración. Sin restringir, cualquiera que la obtenga puede facturarte.
+
+### Siguiente en la lista
+
+- Cobros reales: sustituir el formulario de tarjeta por el SDK de Stripe o
+  Conekta — ver *Pagos*.
+- Iconos de coche fotorrealistas, si se compran o encargan: `CarIcon`
+  centraliza la decisión, así que es cambiar el `CustomPaint` por `Image.asset`.
+- Notificaciones remotas con FCM — ver *Activar push remoto*.
+
 ## Puesta en marcha
 
 ### 1. Instalar herramientas
