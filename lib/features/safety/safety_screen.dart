@@ -68,8 +68,10 @@ class _SafetyScreenState extends ConsumerState<SafetyScreen> {
     }
 
     // La ubicación real se inyecta aquí desde `geolocator`.
-    await Share.share(
-      '${l10n.safetyShareLiveOn}: https://taylor.app/live/demo',
+    await SharePlus.instance.share(
+      ShareParams(
+        text: '${l10n.safetyShareLiveOn}: https://taylor.app/live/demo',
+      ),
     );
 
     if (!mounted) return;

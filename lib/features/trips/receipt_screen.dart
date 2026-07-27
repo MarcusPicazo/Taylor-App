@@ -44,9 +44,11 @@ class ReceiptScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.ios_share_rounded),
             tooltip: l10n.receiptShare,
-            onPressed: () => Share.share(
-              '${l10n.receiptTitle} Taylor · ${money(total)}\n'
-              '${trip.origin.address} → ${trip.destination.address}',
+            onPressed: () => SharePlus.instance.share(
+              ShareParams(
+                text: '${l10n.receiptTitle} Taylor · ${money(total)}\n'
+                    '${trip.origin.address} → ${trip.destination.address}',
+              ),
             ),
           ),
         ],

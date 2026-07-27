@@ -182,9 +182,12 @@ class DriverAssignedCard extends StatelessWidget {
                     icon: Icons.ios_share_rounded,
                     label: l10n.shareTrip,
                     highlighted: true,
-                    onTap: () => Share.share(
-                      '${driver.name} · ${driver.plate}\n'
-                      '${trip.origin.address} → ${trip.destination.address}',
+                    onTap: () => SharePlus.instance.share(
+                      ShareParams(
+                        text: '${driver.name} · ${driver.plate}\n'
+                            '${trip.origin.address} → '
+                            '${trip.destination.address}',
+                      ),
                     ),
                   ),
                 ),

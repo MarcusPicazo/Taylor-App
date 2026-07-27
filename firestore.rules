@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Reglas de Firestore para la DEMO de Taylor.
+//
+// ⚠️  SOLO PARA DEMOSTRACIÓN. Estas reglas dejan la colección de viajes de
+//     demo abierta a lectura y escritura sin autenticación, porque la demo de
+//     dos teléfonos no tiene login real: los dos dispositivos tienen que poder
+//     leer y escribir el mismo documento de viaje al instante.
+//
+//     Esto es aceptable en un proyecto Firebase desechable creado solo para el
+//     pitch. NO debe usarse en producción: cualquiera con el ID del proyecto
+//     podría leer y escribir. Antes de tener datos reales, esto se sustituye
+//     por reglas atadas a `request.auth.uid` y validación de campos.
+//
+// Todo lo que NO sea `demo_rides` queda denegado por defecto, para que un
+// proyecto compartido no exponga otras colecciones por accidente.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /demo_rides/{rideId} {
+      allow read, write: if true;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
