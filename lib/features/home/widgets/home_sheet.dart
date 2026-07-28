@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
+import '../../../core/widgets/pressable.dart';
 import '../../../data/places_repository.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -317,38 +318,35 @@ class _QuickChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Material(
-      color: TaylorColors.raspberry.withValues(alpha: 0.08),
+    return Pressable(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(TaylorRadius.pill),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(TaylorRadius.pill),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(TaylorRadius.pill),
-            border: Border.all(
-              color: TaylorColors.raspberry.withValues(alpha: 0.28),
-            ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: TaylorColors.raspberry.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(TaylorRadius.pill),
+          border: Border.all(
+            color: TaylorColors.raspberry.withValues(alpha: 0.28),
           ),
-          child: Row(
-            children: [
-              Icon(icon, size: 16, color: TaylorColors.brandText),
-              const SizedBox(width: 7),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 130),
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: TaylorColors.brandText,
-                  ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 16, color: TaylorColors.brandText),
+            const SizedBox(width: 7),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 130),
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: TaylorColors.brandText,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -409,6 +407,8 @@ class _RecentRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // Fila sin superficie propia: aquí el destello de Material da mejor
+    // respuesta que un hundido, que solo encogería el texto suelto.
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(TaylorRadius.sm),
@@ -462,8 +462,9 @@ class _DestinationField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(TaylorRadius.md),
       child: Container(
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 18),

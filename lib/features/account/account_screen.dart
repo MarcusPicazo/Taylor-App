@@ -7,6 +7,7 @@ import '../../app/app_mode.dart';
 import '../../app/router.dart';
 import '../../core/theme/taylor_colors.dart';
 import '../../core/theme/taylor_theme.dart';
+import '../../core/widgets/pressable.dart';
 import '../../core/widgets/user_avatar.dart';
 import '../../data/models/driver_profile.dart';
 import '../../data/session_controller.dart';
@@ -121,29 +122,35 @@ class AccountScreen extends ConsumerWidget {
 
             const SizedBox(height: TaylorSpacing.lg),
 
-            AccountRow(
-              icon: Icons.person_outline_rounded,
-              title: l10n.accountProfile,
-              subtitle: l10n.accountProfileBody,
-              onTap: () => context.push(Routes.profile),
-            ),
-            AccountRow(
-              icon: Icons.account_balance_wallet_outlined,
-              title: l10n.accountWallet,
-              subtitle: l10n.accountWalletBody,
-              onTap: () => context.push(Routes.wallet),
-            ),
-            AccountRow(
-              icon: Icons.help_outline_rounded,
-              title: l10n.accountHelp,
-              subtitle: l10n.accountHelpBody,
-              onTap: () => context.push(Routes.help),
-            ),
-            AccountRow(
-              icon: Icons.settings_outlined,
-              title: l10n.accountSettings,
-              subtitle: l10n.accountSettingsBody,
-              onTap: () => context.push(Routes.settings),
+            // Entrada escalonada: al abrir la pestaña, las filas se asientan
+            // una tras otra en lugar de aparecer de golpe. Corre una sola vez.
+            EntranceList(
+              children: [
+                AccountRow(
+                  icon: Icons.person_outline_rounded,
+                  title: l10n.accountProfile,
+                  subtitle: l10n.accountProfileBody,
+                  onTap: () => context.push(Routes.profile),
+                ),
+                AccountRow(
+                  icon: Icons.account_balance_wallet_outlined,
+                  title: l10n.accountWallet,
+                  subtitle: l10n.accountWalletBody,
+                  onTap: () => context.push(Routes.wallet),
+                ),
+                AccountRow(
+                  icon: Icons.help_outline_rounded,
+                  title: l10n.accountHelp,
+                  subtitle: l10n.accountHelpBody,
+                  onTap: () => context.push(Routes.help),
+                ),
+                AccountRow(
+                  icon: Icons.settings_outlined,
+                  title: l10n.accountSettings,
+                  subtitle: l10n.accountSettingsBody,
+                  onTap: () => context.push(Routes.settings),
+                ),
+              ],
             ),
 
             const SizedBox(height: TaylorSpacing.lg),

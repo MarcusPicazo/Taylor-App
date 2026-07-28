@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../core/format/money.dart';
 import '../../../core/theme/taylor_colors.dart';
-import '../../../core/widgets/car_icon.dart';
 import '../../../core/theme/taylor_theme.dart';
+import '../../../core/widgets/car_icon.dart';
+import '../../../core/widgets/pressable.dart';
 import '../../../data/models/ride_tier.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -44,10 +44,8 @@ class RideTierSelector extends StatelessWidget {
                 minutes: minutes,
               ),
               pickupMinutes: tier.pickupMinutes(pickupMinutes),
-              onTap: () {
-                HapticFeedback.selectionClick();
-                onSelected(tier);
-              },
+              // El háptico lo da Pressable; aquí solo la selección.
+              onTap: () => onSelected(tier),
             ),
           ),
       ],
@@ -75,9 +73,9 @@ class _TierRow extends StatelessWidget {
     final l10n = L10n.of(context);
     final theme = Theme.of(context);
 
-    return GestureDetector(
+    return Pressable(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      borderRadius: BorderRadius.circular(TaylorRadius.md),
       child: AnimatedContainer(
         duration: TaylorMotion.fast,
         curve: TaylorMotion.emphasized,

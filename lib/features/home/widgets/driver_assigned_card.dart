@@ -6,6 +6,7 @@ import '../../../app/router.dart';
 import '../../../core/theme/taylor_colors.dart';
 import '../../../core/theme/taylor_theme.dart';
 import '../../../core/widgets/glass_surface.dart';
+import '../../../core/widgets/pressable.dart';
 import '../../../data/models/trip.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -230,7 +231,7 @@ class _ActionChip extends StatelessWidget {
     final color =
         highlighted ? TaylorColors.raspberry : theme.colorScheme.onSurface;
 
-    return InkWell(
+    return Pressable(
       onTap: onTap,
       borderRadius: BorderRadius.circular(TaylorRadius.md),
       child: Container(
